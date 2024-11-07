@@ -45,19 +45,20 @@ public class Room : MonoBehaviour
 {
     public RoomSO baseRoom;
     public Vector2 size;
-    private Vector2 position;
-    private ColorToPrefab[] colorMappings;
+    public Vector2 position;
+    public ColorToPrefab[] colorMappings;
     private bool PlayerInRoom;
-    [SerializeField] float scale = 1.0f;
+    public float scale = 1.0f;
     Vector2 offset = new Vector2(16, 16);
     Texture2D map;
-
+    private LevelGenerator levelGenerator;
     void Start()
     {
         // Initialize the room's position
         position = new Vector2(transform.position.x, transform.position.z);
         colorMappings = GameManager.Instance.colorMappings;
         map = baseRoom.layout;
+        levelGenerator = FindObjectOfType<LevelGenerator>();
     }
 
     public bool GetPlayerInRoom()
@@ -99,7 +100,7 @@ public class Room : MonoBehaviour
     protected virtual void OnPlayerEnter() { }
     protected virtual void OnPlayerExit() { }
 
-    void GenerateLevel()
+    public void GenerateRoom()
     {
         offset = new Vector2(map.width / 2, map.height / 2);
         offset *= scale;
@@ -111,14 +112,15 @@ public class Room : MonoBehaviour
             }
         }
     }
+
     void GenerateTile(int x, int y)
     {
         Color pixColor = map.GetPixel(x, y);
 
         if (pixColor.a == 0)
         {
+            // Transparent pixel, ignore
             return;
-            //blank pixel
         }
 
         foreach (ColorToPrefab colorMapping in colorMappings)
@@ -126,11 +128,24 @@ public class Room : MonoBehaviour
             if (colorMapping.color.Equals(pixColor))
             {
                 Vector3 position = new Vector3((x * scale) - offset.x, 0, (y * scale) - offset.y);
+                position += transform.position; 
+
                 var inst = Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
                 inst.transform.localScale *= scale;
             }
         }
-
-
     }
+    public Vector2 GetExitDirection()
+    {
+        List<Vector2> directions = baseRoom.GetDirection();
+        if (directions.Count > 0)
+        {
+            return directions[0]; 
+        }
+        else
+        {
+            return Vector2.zero;
+        }
+    }
+
 }

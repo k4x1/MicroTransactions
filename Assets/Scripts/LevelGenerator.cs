@@ -1,73 +1,64 @@
-using JetBrains.Annotations;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
 {
-    public Texture2D map;
+    public RoomSO[] rooms; // Array of room scriptable objects
     public ColorToPrefab[] colorMappings;
-    public Texture2D[] levels;
-    int currentLevel = 0;
+    public int maxRooms = 5; // Example maximum number of rooms
     [SerializeField] float scale = 1.0f;
-    Vector2 offset = new Vector2(16,16);
-    // Start is called before the first frame update
+
+    private List<Room> generatedRooms = new List<Room>();
+
     void Start()
     {
-        map = levels[currentLevel];
-        foreach (Transform child in transform)
-        {
-            Destroy(child.gameObject);
-        }
         GenerateLevel();
-  
     }
-     void Update()
+
+    void GenerateLevel()
     {
-        
-        if (GameManager.Instance.won && currentLevel< levels.Length-1) {
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
-            }
-            GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(0, 1, 0);
-            GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().velocity = Vector3.zero;
-            currentLevel++;
-            map = levels[currentLevel];
-            //GetComponent<LevelMovement>().ResetOrientation();
-            GenerateLevel();
-            GameManager.Instance.won = false;
-            UiManager.Instance.SetWinMenu(false);
-        }
-   
-    }
+        // Initialize the level generation
+        Vector2 currentPos = Vector2.zero;
 
-    void GenerateLevel() {
-        offset = new Vector2(map.width/2, map.height/2);
-        offset*=scale;
-        for (int x = 0 ; x < map.width; x++)
+        // For simplicity, start with the first room
+        RoomSO startingRoom = rooms[0];
+        GenerateRoom(startingRoom, currentPos);
+
+        // Generate additional rooms
+        for (int i = 1; i < maxRooms; i++)
         {
-            for (int y = 0; y < map.height; y++)
-            {
-                GenerateTile(x, y);
-            }
+            // For this example, pick a random room
+            RoomSO nextRoom = rooms[Random.Range(0, rooms.Length)];
+
+            // Get possible exit directions from the last room
+            Room lastRoom = generatedRooms[generatedRooms.Count - 1];
+            Vector2 exitDirection = lastRoom.GetExitDirection();
+
+            // Calculate the position for the next room
+            currentPos += exitDirection * lastRoom.size * scale;
+
+            // Generate the room at the new position
+            GenerateRoom(nextRoom, currentPos);
         }
     }
-    void GenerateTile(int x, int y) { 
-        Color pixColor = map.GetPixel(x, y);
- 
-        if (pixColor.a == 0) {
-            return;
-            //blank pixel
-        }
-        
-        foreach (ColorToPrefab colorMapping in colorMappings) {
-            if (colorMapping.color.Equals(pixColor)) {
-                Vector3 position = new Vector3((x*scale) - offset.x, 0, (y*scale) - offset.y);
-                var inst = Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
-                inst.transform.localScale*=scale;
-            }
-        }
 
+    void GenerateRoom(RoomSO roomSO, Vector2 position)
+    {
+        // Instantiate a new Room GameObject
+        GameObject roomObj = new GameObject("Room");
+        roomObj.transform.position = new Vector3(position.x, 0, position.y);
+        roomObj.transform.parent = transform;
 
+        // Add the Room component
+        Room room = roomObj.AddComponent<Room>();
+        room.baseRoom = roomSO;
+        room.scale = scale;
+        room.colorMappings = colorMappings;
+
+        // Generate the room
+        room.GenerateRoom();
+
+        // Add to the list of generated rooms
+        generatedRooms.Add(room);
     }
 }

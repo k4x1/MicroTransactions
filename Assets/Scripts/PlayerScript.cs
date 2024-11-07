@@ -9,6 +9,8 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float accelerationRate = 2.0f;
     [SerializeField] private float decelerationRate = 2.0f;
     [SerializeField] private float maxSpeed = 10.0f;
+    [SerializeField] private float maxRate = 50f; 
+
     private Rigidbody rb;
 
     void Start()
@@ -29,21 +31,43 @@ public class PlayerScript : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Get the movement vector from the InputManager
         Vector2 moveVector = InputManager.Instance.MovementVector;
-
-        // Convert the 2D movement vector to 3D
         Vector3 targetVelocity = new Vector3(moveVector.x, 0, moveVector.y) * movementSpeed;
 
         if (moveVector.magnitude > 0)
         {
-            // Apply acceleration towards the target velocity
-            rb.velocity += new Vector3(moveVector.x * accelerationRate, 0, moveVector.y * accelerationRate) * Time.deltaTime;
+            float accelerationPercentage = Mathf.Clamp01(accelerationRate / maxRate);
+
+            if (accelerationPercentage >= 1f)
+            {
+                rb.velocity = targetVelocity;
+            }
+            else if (accelerationPercentage > 0f)
+            {
+                rb.velocity = Vector3.MoveTowards(rb.velocity, targetVelocity, accelerationRate * Time.deltaTime);
+            }
         }
         else
         {
-            // Apply deceleration towards zero velocity
-            rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, decelerationRate * Time.deltaTime);
+            float decelerationPercentage = Mathf.Clamp01(decelerationRate / maxRate);
+
+            if (decelerationPercentage > 0f)
+            {
+                if (decelerationPercentage >= 1f)
+                {
+                    rb.velocity = Vector3.zero;
+                }
+                else
+                {
+                    float decelerationAmount = Mathf.Lerp(0, maxSpeed, decelerationPercentage) * Time.deltaTime;
+                    rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, decelerationAmount);
+                }
+            }
+            // If deceleration is 0, maintain current velocity
+            else
+            {
+                // No change to velocity
+            }
         }
 
         // Clamp the velocity to the max speed
@@ -54,17 +78,17 @@ public class PlayerScript : MonoBehaviour
     }
 
 
-
     private void OnTriggerEnter(Collider other)
     {
         UiManager.Instance.SetWinMenu(true);
     }
 
-    public void SetMovementParameters(float acceleration, float deceleration, float maxSpeed)
+    public void SetMovementParameters(float _maxRate, float _acceleration, float _deceleration, float _maxSpeed)
     {
-        this.accelerationRate = acceleration;
-        this.decelerationRate = deceleration;
-        this.maxSpeed = maxSpeed;
+        this.accelerationRate = _acceleration;
+        this.decelerationRate = _deceleration;
+        this.maxSpeed = _maxSpeed;
+        this.maxRate = _maxRate;
     }
 
     public void ResetPlayer()

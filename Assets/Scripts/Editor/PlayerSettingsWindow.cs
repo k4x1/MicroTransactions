@@ -6,7 +6,7 @@ public class PlayerSettingsWindow : EditorWindow
     private float accelerationRate = 2.0f;
     private float decelerationRate = 2.0f;
     private float maxSpeed = 10.0f;
-    private float maxNumber = 50.0f;
+    private float maxRate = 50.0f;
 
     [MenuItem("Window/Player Settings")]
     public static void ShowWindow()
@@ -36,46 +36,53 @@ public class PlayerSettingsWindow : EditorWindow
         // Calculate scaling factor for the graph
         float baseScale = 5.0f;
         float adjustmentFactor = 10.0f;
-        float scaleFactor = baseScale / (1.0f + maxNumber / adjustmentFactor);
+        float scaleFactor = baseScale / (1.0f + maxRate / adjustmentFactor);
 
         // Calculate horizontal positions based on the ratio to maxNumber
-        float accelerationXPosition = graphRect.x + graphRect.width * (accelerationRate / maxNumber);
-        float decelerationXPosition = graphRect.x + graphRect.width * (decelerationRate / maxNumber);
+        float decelerationXPosition = graphRect.x + graphRect.width * (decelerationRate / maxRate);
+
+        // Calculate max speed line position
+        float maxSpeedYPosition = graphRect.y + graphRect.height * (1 - maxSpeed / maxRate);
 
         // Draw lines representing acceleration and deceleration
         Handles.color = Color.green;
-        Handles.DrawLine(
-            new Vector3(graphRect.x, graphRect.y + graphRect.height, 0),
-            new Vector3(accelerationXPosition, graphRect.y, 0)
+
+        // Calculate acceleration line endpoints
+        Vector3 accelerationStart = new Vector3(graphRect.x, graphRect.y + graphRect.height, 0);
+        Vector3 accelerationEnd = new Vector3(
+            Mathf.Lerp(graphRect.x + graphRect.width, graphRect.x, accelerationRate / maxRate),
+            maxSpeedYPosition,
+            0
         );
 
+        Handles.DrawLine(accelerationStart, accelerationEnd);
+
         Handles.color = Color.red;
-        Handles.DrawLine(
-            new Vector3(graphRect.x + graphRect.width, graphRect.y + graphRect.height, 0),
-            new Vector3(decelerationXPosition, graphRect.y, 0)
-        );
+        Vector3 decelerationStart = new Vector3(graphRect.x + graphRect.width, graphRect.y + graphRect.height, 0);
+        Vector3 decelerationEnd = new Vector3(decelerationXPosition, maxSpeedYPosition, 0);
+        Handles.DrawLine(decelerationStart, decelerationEnd);
 
         // Draw max speed line
         Handles.color = Color.blue;
-        float maxSpeedYPosition = graphRect.y + graphRect.height * (1 - maxSpeed / maxNumber);
         Handles.DrawLine(
             new Vector3(graphRect.x, maxSpeedYPosition, 0),
             new Vector3(graphRect.x + graphRect.width, maxSpeedYPosition, 0)
         );
 
         // Add controls to adjust values
-        maxNumber = EditorGUILayout.FloatField("Max Number", maxNumber);
-        accelerationRate = EditorGUILayout.Slider("Acceleration Rate", accelerationRate, 0f, maxNumber);
-        decelerationRate = EditorGUILayout.Slider("Deceleration Rate", decelerationRate, 0f, maxNumber);
-        maxSpeed = EditorGUILayout.Slider("Max Speed", maxSpeed, 0f, maxNumber);
+        maxRate = EditorGUILayout.FloatField("Max Number", maxRate);
+        accelerationRate = EditorGUILayout.Slider("Acceleration Rate", accelerationRate, 0f, maxRate);
+        decelerationRate = EditorGUILayout.Slider("Deceleration Rate", decelerationRate, 0f, maxRate);
+        maxSpeed = EditorGUILayout.Slider("Max Speed", maxSpeed, 0f, maxRate);
     }
+
 
     private void ApplySettingsToPlayer()
     {
         PlayerScript playerScript = FindObjectOfType<PlayerScript>();
         if (playerScript != null)
         {
-            playerScript.SetMovementParameters(accelerationRate, decelerationRate, maxSpeed);
+            playerScript.SetMovementParameters(maxRate, accelerationRate, decelerationRate, maxSpeed);
         }
         else
         {
