@@ -1,109 +1,88 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.Timeline;
 
-public enum Direction
-{
-    UP, DOWN, LEFT, RIGHT
-}
-[CreateAssetMenu(fileName = "NewRoom", menuName = "ScriptableObjects/Room", order = 1)]
-public class RoomSO : ScriptableObject 
+public enum Direction { UP, DOWN, LEFT, RIGHT }
+
+[CreateAssetMenu(fileName = "NewRoom", menuName = "ScriptableObjects/Room")]
+public class RoomSO : ScriptableObject
 {
     public Texture2D layout;
     public Direction[] directions;
 
-    public List<Vector2> GetDirection()
+    public List<Vector2> GetDirections()
     {
-        List<Vector2> vecDirection = new List<Vector2>();
-        foreach (Direction dir in directions)
+        return directions.Select(dir => dir switch
         {
-            switch (dir)
-            {
-                case Direction.UP:
-                    vecDirection.Add(new Vector2(0, 1));
-                    break;
-                case Direction.DOWN:
-                    vecDirection.Add(new Vector2(0, -1));
-                    break;
-                case Direction.LEFT:
-                    vecDirection.Add(new Vector2(-1, 0));
-                    break;
-                case Direction.RIGHT:
-                    vecDirection.Add(new Vector2(1, 0));
-                    break;
-                default:
-                    break;
-            }
-        }
-        return vecDirection;
+            Direction.UP => Vector2.up,
+            Direction.DOWN => Vector2.down,
+            Direction.LEFT => Vector2.left,
+            Direction.RIGHT => Vector2.right,
+            _ => Vector2.zero
+        }).ToList();
     }
-
 }
+
 
 public class Room : MonoBehaviour
 {
     public RoomSO baseRoom;
     public Vector2 size;
-    public Vector2 position;
+    public float position;
     public ColorToPrefab[] colorMappings;
-    private bool PlayerInRoom;
     public float scale = 1.0f;
-    Vector2 offset = new Vector2(16, 16);
-    Texture2D map;
-    private LevelGenerator levelGenerator;
-    void Start()
+    public LevelGenerator levelGenerator;
+    public int rotation;
+
+    private Texture2D map;
+    private Vector2 offset;
+    private Vector3 roomCenter;
+    private const float detectionRadius = 8f;
+    private bool playerInRoom = false;
+    private bool generated = false;
+    private bool playerEnteredRoom = false;
+    public void Initialize()
     {
-        // Initialize the room's position
-        position = new Vector2(transform.position.x, transform.position.z);
-        colorMappings = GameManager.Instance.colorMappings;
-        map = baseRoom.layout;
+        map = baseRoom.layout ?? throw new System.ArgumentNullException(nameof(baseRoom));
         levelGenerator = FindObjectOfType<LevelGenerator>();
+        offset = new Vector2(map.width * 0.5f, map.height * 0.5f) * scale;
+        roomCenter = transform.position;
+        transform.rotation = Quaternion.Euler(0, rotation, 0);
+        
     }
 
-    public bool GetPlayerInRoom()
+    void Update()
     {
-        if (GameManager.Instance.playerRef == null) return false;
-
-        Vector2 playerPosition = new Vector2(GameManager.Instance.playerRef.transform.position.x, GameManager.Instance.playerRef.transform.position.z);
-
-        return IsPointInRoom(playerPosition);
-    }
-
-    private bool IsPointInRoom(Vector2 point)
-    {
-        float halfWidth = size.x / 2f;
-        float halfHeight = size.y / 2f;
-
-        return (point.x >= position.x - halfWidth && point.x <= position.x + halfWidth &&
-                point.y >= position.y - halfHeight && point.y <= position.y + halfHeight);
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Player"))
+        bool currentPlayerInRoom = IsPlayerInRoom();
+        if (currentPlayerInRoom != playerInRoom)
         {
-            PlayerInRoom = true;
-            OnPlayerEnter();
+            if (playerInRoom)
+            {
+                OnPlayerExit();
+            }
+            else
+            {
+                OnPlayerEnter();
+            }
         }
+        playerInRoom = currentPlayerInRoom;
     }
+    protected virtual void OnPlayerEnter() => GenerateAdjacentRooms();
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            PlayerInRoom = false;
-            OnPlayerExit();
-        }
-    }
-
-    protected virtual void OnPlayerEnter() { }
     protected virtual void OnPlayerExit() { }
+
+    public bool IsPlayerInRoom()
+    {
+        Transform playerTransform = GameManager.Instance.playerRef.transform;
+        return Vector3.Distance(roomCenter, playerTransform.position) <= detectionRadius;
+    }
 
     public void GenerateRoom()
     {
-        offset = new Vector2(map.width / 2, map.height / 2);
-        offset *= scale;
+        if (map == null || baseRoom == null || colorMappings == null)
+            throw new System.ArgumentNullException();
+
         for (int x = 0; x < map.width; x++)
         {
             for (int y = 0; y < map.height; y++)
@@ -116,36 +95,86 @@ public class Room : MonoBehaviour
     void GenerateTile(int x, int y)
     {
         Color pixColor = map.GetPixel(x, y);
+        if (pixColor.a == 0) return;
 
-        if (pixColor.a == 0)
+        var mapping = colorMappings.FirstOrDefault(cm => cm.color.Equals(pixColor));
+        if (mapping.prefab != null)
         {
-            // Transparent pixel, ignore
-            return;
+            Vector2 rotatedPos = RotatePoint(new Vector2(x, y), rotation, map.width, map.height);
+            Vector3 position = transform.position + new Vector3((rotatedPos.x * scale) - offset.x, 0, (rotatedPos.y * scale) - offset.y);
+            var inst = Instantiate(mapping.prefab, position, Quaternion.Euler(0, rotation, 0), transform);
+            inst.transform.localScale *= scale;
         }
+    }
 
-        foreach (ColorToPrefab colorMapping in colorMappings)
+    private Vector2 RotatePoint(Vector2 point, int rotationDegrees, int width, int height)
+    {
+        Vector2 center = new Vector2(width / 2f, height / 2f);
+        Vector2 dir = point - center;
+        float rad = rotationDegrees * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(rad);
+        float sin = Mathf.Sin(rad);
+        Vector2 rotatedDir = new Vector2(
+            dir.x * cos - dir.y * sin,
+            dir.x * sin + dir.y * cos
+        );
+        return center + rotatedDir;
+    }
+    private void GenerateAdjacentRooms()
+    {
+        if (levelGenerator.generatedRooms.Count >= levelGenerator.maxRooms) return;
+
+        foreach (Vector2 exitDirection in GetExitDirections())
         {
-            if (colorMapping.color.Equals(pixColor))
-            {
-                Vector3 position = new Vector3((x * scale) - offset.x, 0, (y * scale) - offset.y);
-                position += transform.position; 
+            // Only generate rooms in the upward direction
+            if (exitDirection != Vector2.up) continue;
 
-                var inst = Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
-                inst.transform.localScale *= scale;
+            Vector3 newPosition = transform.position + new Vector3(exitDirection.x * map.width * scale, 0, exitDirection.y * map.height * scale);
+
+            // Calculate the center of the new room
+            Vector3 newRoomCenter = newPosition;
+
+            if (!levelGenerator.roomPositions.ContainsKey(newRoomCenter.z))
+            {
+                RoomSO nextRoomSO;
+                int roomRotation;
+                if (levelGenerator.FindRoomWithEntrance(-exitDirection, out nextRoomSO, out roomRotation))
+                {
+                    levelGenerator.GenerateRoom(nextRoomSO, newRoomCenter, roomRotation);
+                }
             }
         }
-    }
-    public Vector2 GetExitDirection()
-    {
-        List<Vector2> directions = baseRoom.GetDirection();
-        if (directions.Count > 0)
+        generated = true;
+
+        if (levelGenerator.generatedRooms.Count > levelGenerator.maxRooms-1)
         {
-            return directions[0]; 
-        }
-        else
-        {
-            return Vector2.zero;
+            Room firstRoom = levelGenerator.generatedRooms[0];
+            levelGenerator.generatedRooms.RemoveAt(0);
+            levelGenerator.roomPositions.Remove(firstRoom.position);
+            Destroy(firstRoom.gameObject);
         }
     }
 
+
+    public List<Vector2> GetExitDirections()
+    {
+        return baseRoom.GetDirections().Select(dir => RotateDirection(dir, rotation)).ToList();
+    }
+
+    private Vector2 RotateDirection(Vector2 dir, int rotationDegrees)
+    {
+        float rad = rotationDegrees * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(rad);
+        float sin = Mathf.Sin(rad);
+        return new Vector2(
+            dir.x * cos - dir.y * sin,
+            dir.x * sin + dir.y * cos
+        ).normalized;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(roomCenter, detectionRadius);
+    }
 }

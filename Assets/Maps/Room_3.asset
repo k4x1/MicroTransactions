@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Room_3
   m_EditorClassIdentifier: Assembly-CSharp::RoomSO
-  layout: {fileID: 0}
-  directions: 
+  layout: {fileID: 2800000, guid: 42227e8349da428419986df2ee45a1b9, type: 3}
+  directions: 00000000010000000200000003000000
