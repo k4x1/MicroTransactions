@@ -38,7 +38,7 @@ public class Room : MonoBehaviour
     private Texture2D map;
     private Vector2 offset;
     private Vector3 roomCenter;
-    private const float detectionRadius = 8f;
+    private float detectionRadius = 8f;
     private bool playerInRoom = false;
     private bool generated = false;
     private bool playerEnteredRoom = false;
@@ -49,7 +49,7 @@ public class Room : MonoBehaviour
         offset = new Vector2(map.width * 0.5f, map.height * 0.5f) * scale;
         roomCenter = transform.position;
         transform.rotation = Quaternion.Euler(0, rotation, 0);
-        
+        detectionRadius = (map.width/2) * scale;
     }
 
     void Update()

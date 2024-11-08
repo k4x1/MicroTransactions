@@ -3,25 +3,40 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
+
     private Rigidbody rb;
-    public GameObject target;
-    [SerializeField] private float detectRange;
     private float distanceToTarget;
     private SpriteRenderer spriteRenderer;
 
-    // Movement variables
+    [Header("Movement Stuff")]
+    [SerializeField] private float detectRange;
+    public GameObject target;
     public float speed = 0.1f;
     public float speedCap = 5.0f;
     public float turnDelay = 0.5f; // Sets speed to this number when turning so slide isn't that bad
     public float turnSpeed = 0.4f;
     public float health = 100;
 
+
+    [Header("Scale Stuff")]
+    private Vector3 initialScale;
+    private const float shrinkDuration = 5f;
+    private const float minScaleFactor = 0.1f;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        target = GameObject.FindGameObjectWithTag("Player");
+        initialScale = transform.localScale;
     }
-
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            StartCoroutine(ShrinkAndDestroy());
+        }
+    }
     void Update()
     {
         if (TargetInAttackRange())
@@ -39,6 +54,29 @@ public class EnemyAI : MonoBehaviour
             0, // No vertical movement
             Mathf.Clamp(direction.z * speed, -speedCap, speedCap)
         );
+    }
+
+    private IEnumerator ShrinkAndDestroy()
+    {
+        float elapsedTime = 0f;
+        Vector3 startScale = transform.localScale;
+        Vector3 endScale = initialScale * minScaleFactor;
+        float startMass = rb.mass;
+        float endMass = startMass * minScaleFactor;
+
+        while (elapsedTime < shrinkDuration && transform.localScale.magnitude > endScale.magnitude)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / shrinkDuration);
+            transform.localScale = Vector3.Lerp(startScale, endScale, t);
+            rb.mass = Mathf.Lerp(startMass, endMass, t);
+
+            yield return null;
+        }
+
+        transform.localScale = endScale;
+        rb.mass = endMass;
+        Destroy(gameObject);
     }
 
     private bool TargetInAttackRange()

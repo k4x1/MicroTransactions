@@ -3,7 +3,7 @@ using TMPro;
 
 public class Timer : MonoBehaviour
 {
-    [SerializeField] private float timerDuration = 5f; 
+    [SerializeField] private float timerDuration = 5f;
     [SerializeField] private TMP_Text timerText;
 
     private float timer;
@@ -18,10 +18,10 @@ public class Timer : MonoBehaviour
     {
         if (timerRunning)
         {
-            timer -= Time.deltaTime;
+            timer += Time.deltaTime;
             UpdateTimerDisplay();
 
-            if (timer <= 0f)
+            if (timer >= timerDuration)
             {
                 timerRunning = false;
                 TimerDone();
@@ -31,21 +31,21 @@ public class Timer : MonoBehaviour
 
     public void StartTimer()
     {
-        timer = timerDuration;
+        timer = 0f;
         timerRunning = true;
-        UpdateTimerDisplay(); 
+        UpdateTimerDisplay();
     }
 
     private void UpdateTimerDisplay()
     {
         if (timerText != null)
         {
-            timerText.text = Mathf.Max(0, timer).ToString("F2"); 
+            timerText.text = Mathf.Min(timerDuration, timer).ToString("F2");
         }
     }
 
     private void TimerDone()
     {
-        Debug.Log("timer done");
+        Debug.Log("Timer done");
     }
 }
