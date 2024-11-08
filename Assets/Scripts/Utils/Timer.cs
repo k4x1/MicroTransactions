@@ -3,15 +3,21 @@ using TMPro;
 
 public class Timer : MonoBehaviour
 {
-    [SerializeField] private float timerDuration = 5f;
+    public float timerDuration = 5f;
     [SerializeField] private TMP_Text timerText;
+    private System.Action onTimerComplete;
 
     private float timer;
     private bool timerRunning = false;
 
+    public void SetOnTimerComplete(System.Action callback)
+    {
+        onTimerComplete = callback;
+    }
+
     private void Start()
     {
-        StartTimer();
+        StopTimer();
     }
 
     private void Update()
@@ -47,5 +53,24 @@ public class Timer : MonoBehaviour
     private void TimerDone()
     {
         Debug.Log("Timer done");
+        if (onTimerComplete != null)
+        {
+            onTimerComplete.Invoke();
+        }
+    }
+
+    public bool IsTimerRunning()
+    {
+        return timerRunning;
+    }
+
+    public float GetTimerValue()
+    {
+        return timer;
+    }
+
+    public void StopTimer()
+    {
+        timerRunning = false;
     }
 }

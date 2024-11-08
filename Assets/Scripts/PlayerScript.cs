@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -11,25 +11,32 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float maxSpeed = 10.0f;
     [SerializeField] private float maxRate = 50f;
     [SerializeField] private string bounceObjectTag = "BouncyObject";
+    [SerializeField] private string speedObjectTag = "Speed";
     [SerializeField] private float reflectionFactor = 0.8f;
+    [SerializeField] private float speedBoostDuration = 5f;
+    [SerializeField] private float speedBoostMultiplier = 2f;
+    [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody rb;
     private bool isBouncing = false;
     private float bounceTimer = 0f;
     private const float bounceDuration = 0.5f;
+    private bool isOnSpeedSurface = false;
+    private float originalMaxSpeed;
+    private float originalAccelerationRate;
 
-    [SerializeField] private float speedBoostDuration = 5f;
-    [SerializeField] private float speedBoostMultiplier = 2f;
-    [SerializeField] private LayerMask groundLayer;
-        private bool isOnSpeedSurface = false;
-    private Vector3 originalMaxSpeed;
-    private Vector3 originalAccelerationRate;
+    private Timer speedBoostTimer;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         InputManager.Instance.SetInputMode(inputMode);
-    }
 
+        speedBoostTimer = gameObject.AddComponent<Timer>();
+        speedBoostTimer.timerDuration = speedBoostDuration;
+        speedBoostTimer.StopTimer(); // Initially stopped
+        speedBoostTimer.SetOnTimerComplete(() => ResetSpeed());
+    }
     void Update()
     {
         if (transform.position.y < -20)
@@ -47,6 +54,55 @@ public class PlayerScript : MonoBehaviour
                 isBouncing = false;
             }
         }
+
+        CheckForSpeedSurface();
+    }
+
+    private void CheckForSpeedSurface()
+    {
+        RaycastHit hit;
+        Vector3 rayOrigin = transform.position;
+        Vector3 rayDirection = Vector3.down;
+
+        if (Physics.Raycast(rayOrigin, rayDirection, out hit, 1f))
+        {
+            Debug.DrawRay(rayOrigin, rayDirection * hit.distance, Color.green, Time.deltaTime);
+            if (hit.collider.CompareTag(speedObjectTag) && !isOnSpeedSurface)
+            {
+                ApplySpeedBoost();
+            }
+            else if (!hit.collider.CompareTag(speedObjectTag) && isOnSpeedSurface)
+            {
+               // ResetSpeed();
+            }
+        }
+        else
+        {
+            if (isOnSpeedSurface)
+            {
+              //  ResetSpeed();
+            }
+        }
+    }
+
+    private void ApplySpeedBoost()
+    {
+        isOnSpeedSurface = true;
+        originalMaxSpeed = maxSpeed;
+        originalAccelerationRate = accelerationRate;
+
+        maxSpeed *= speedBoostMultiplier;
+        accelerationRate *= speedBoostMultiplier;
+
+        speedBoostTimer.StartTimer();
+    }
+
+    private void ResetSpeed()
+    {
+        isOnSpeedSurface = false;
+        maxSpeed = originalMaxSpeed;
+        accelerationRate = originalAccelerationRate;
+        speedBoostTimer.StopTimer();
     }
 
     private void FixedUpdate()
@@ -90,7 +146,6 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-
     private void Decelerate()
     {
         float decelerationPercentage = Mathf.Clamp01(decelerationRate / maxRate);
@@ -105,7 +160,6 @@ public class PlayerScript : MonoBehaviour
             rb.velocity += deceleration * Time.fixedDeltaTime;
         }
     }
-
 
     private void OnCollisionEnter(Collision collision)
     {
