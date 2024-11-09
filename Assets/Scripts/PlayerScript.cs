@@ -16,6 +16,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float speedBoostDuration = 5f;
     [SerializeField] private float speedBoostMultiplier = 2f;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float turnFactor = 1.5f;
 
     private Rigidbody rb;
     private bool isBouncing = false;
@@ -129,6 +130,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+
     private void Accelerate(Vector3 targetDirection)
     {
         float accelerationPercentage = Mathf.Clamp01(accelerationRate / maxRate);
@@ -142,9 +144,15 @@ public class PlayerScript : MonoBehaviour
         else
         {
             Vector3 acceleration = (targetVelocity - rb.velocity) * accelerationPercentage;
-            rb.velocity += acceleration * Time.fixedDeltaTime;
+
+            // Apply turn factor
+            float angleBetweenDirections = Vector3.Angle(rb.velocity.normalized, targetDirection);
+            float turnMultiplier = Mathf.Lerp(1f, turnFactor, angleBetweenDirections / 180f);
+
+            rb.velocity += acceleration * turnMultiplier * Time.fixedDeltaTime;
         }
     }
+
 
     private void Decelerate()
     {
@@ -161,33 +169,16 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+
+    public void Bounce(Vector3 _pos)
     {
-        if (collision.gameObject.CompareTag(bounceObjectTag))
-        {
-            ReflectPlayer(collision);
-        }
-    }
+       Vector3 direction = (_pos - transform.position).normalized;
 
-    private void ReflectPlayer(Collision collision)
-    {
-        ContactPoint contact = collision.contacts[0];
+        // Apply a fixed upward force
+        rb.AddForce(-direction * reflectionFactor, ForceMode.Impulse);
 
-        Vector3 incidentVector = rb.velocity.normalized;
-        Vector3 normalVector = contact.normal;
-        Vector3 reflectionVector = Vector3.Reflect(incidentVector, normalVector);
-
-        float incomingSpeed = rb.velocity.magnitude;
-        Vector3 newVelocity = reflectionVector * incomingSpeed * reflectionFactor;
-        Debug.Log(rb.velocity + " | " + newVelocity);
-        rb.velocity = newVelocity;
         isBouncing = true;
         bounceTimer = bounceDuration;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        UiManager.Instance.SetWinMenu(true);
     }
 
     public void SetMovementParameters(float _maxRate, float _acceleration, float _deceleration, float _maxSpeed)

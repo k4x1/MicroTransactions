@@ -20,8 +20,8 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Scale Stuff")]
     private Vector3 initialScale;
-    private const float shrinkDuration = 5f;
-    private const float minScaleFactor = 0.1f;
+    [SerializeField] private float shrinkDuration = 5f;
+    [SerializeField] private float minScaleFactor = 0.1f;
 
     void Start()
     {

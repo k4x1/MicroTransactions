@@ -175,6 +175,36 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8180657155683494306, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
+        type: 3}
+      propertyPath: speed
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180657155683494306, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
+        type: 3}
+      propertyPath: health
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180657155683494306, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
+        type: 3}
+      propertyPath: speedCap
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180657155683494306, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
+        type: 3}
+      propertyPath: turnSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180657155683494306, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
+        type: 3}
+      propertyPath: detectRange
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180657155683494306, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
+        type: 3}
+      propertyPath: shrinkDuration
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 9073079553726451368, guid: a53e3080eb5c2ec4b8545fe1a2df099c,
         type: 3}
       propertyPath: m_Name

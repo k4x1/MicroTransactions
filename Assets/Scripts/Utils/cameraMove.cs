@@ -1,16 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
     public Transform PlayerTransform;
     public float smoothTime = 0.3f;
+    public float zSmoothTime = 0.05f; 
     public Vector3 offset;
     public float lookAheadDistance = 2.0f;
 
     private Vector3 velocity = Vector3.zero;
     private Rigidbody playerRigidbody;
+    private float zVelocity = 0f;
 
     private void Start()
     {
@@ -19,7 +19,6 @@ public class CameraMove : MonoBehaviour
             PlayerTransform = GameObject.FindWithTag("Player").transform;
         }
         playerRigidbody = PlayerTransform.GetComponent<Rigidbody>();
-        offset = transform.position - PlayerTransform.position;
     }
 
     private void FixedUpdate()
@@ -32,7 +31,19 @@ public class CameraMove : MonoBehaviour
         // Add look-ahead position to the target position
         targetPosition += lookAheadPosition;
 
-        // Smoothly move the camera to the target position
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        // Separate Z component
+        float targetZ = targetPosition.z;
+
+        // Create a new vector with only X and Y components
+        Vector3 xyTargetPosition = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
+
+        // Smoothly move the camera's X and Y positions
+        Vector3 smoothedXYPosition = Vector3.SmoothDamp(transform.position, xyTargetPosition, ref velocity, smoothTime);
+
+        // Smooth Z position separately with a smaller smoothing factor
+        float smoothedZ = Mathf.SmoothDamp(transform.position.z, targetZ, ref zVelocity, zSmoothTime);
+
+        // Combine smoothed XY with slightly smoothed Z
+        transform.position = new Vector3(smoothedXYPosition.x, smoothedXYPosition.y, smoothedZ);
     }
 }

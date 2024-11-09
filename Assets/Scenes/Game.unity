@@ -706,7 +706,7 @@ Rigidbody:
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -715,7 +715,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 4
   m_CollisionDetection: 2
 --- !u!135 &144930446
 SphereCollider:
@@ -796,9 +796,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 144930444}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.67, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.3, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -817,10 +817,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputMode: 0
   movementSpeed: 5
-  accelerationRate: 12.1
-  decelerationRate: 70.5
-  maxSpeed: 100
-  maxRate: 100
+  accelerationRate: 35
+  decelerationRate: 73
+  maxSpeed: 125
+  maxRate: 125
+  bounceObjectTag: Bounce
+  speedObjectTag: Speed
+  reflectionFactor: 100
+  speedBoostDuration: 1
+  speedBoostMultiplier: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  turnFactor: 3
 --- !u!1 &147815723
 GameObject:
   m_ObjectHideFlags: 0
@@ -2585,10 +2594,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 778bfb29a959ae04ebf11253b634ccf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerTransform: {fileID: 0}
-  smoothTime: 1
-  offset: {x: 0, y: 0, z: 0}
-  lookAheadDistance: 2
+  PlayerTransform: {fileID: 144930449}
+  smoothTime: 0.1
+  zSmoothTime: 0.05
+  offset: {x: 0, y: 40, z: 5}
+  lookAheadDistance: 3
 --- !u!1 &1140401873
 GameObject:
   m_ObjectHideFlags: 0
@@ -4142,10 +4152,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e72ac7073a0e3f4a85ffdb4186e6027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rooms:
-  - {fileID: 11400000, guid: 2cf82f0992a3ca94a83b929405d4534d, type: 2}
-  - {fileID: 11400000, guid: ec8fc78e4bdd9604ab4d2ed1938f9474, type: 2}
-  - {fileID: 11400000, guid: 7b9ab9cb45ada50459e0f64a05709a39, type: 2}
+  roomTextures:
+  - {fileID: 2800000, guid: f2f91a9cb11de124b87e1038bc785da8, type: 3}
+  - {fileID: 2800000, guid: b9deb97ec7d9afd46b9c7f47baca3ad9, type: 3}
+  - {fileID: 2800000, guid: 92e517f64ec89b44b9c44b13d9f775c5, type: 3}
+  - {fileID: 2800000, guid: 13b1ceb2f17546342a0fd8717c523e51, type: 3}
+  - {fileID: 2800000, guid: 7f6aad86458ece345af2d91554a2f02a, type: 3}
+  - {fileID: 2800000, guid: 51b3295ed294f2b40a1b1294c1d5047c, type: 3}
+  - {fileID: 2800000, guid: 9484805a30d310f4883b989b88be6fbb, type: 3}
+  - {fileID: 2800000, guid: 4563a42ec5fa74f458bac872e015fdc0, type: 3}
   colorMappings:
   - color: {r: 0, g: 0, b: 0, a: 1}
     prefab: {fileID: 5910413905335229083, guid: 74e43cb44c2771b468bff762fc1c989e,
@@ -4153,11 +4168,16 @@ MonoBehaviour:
   - color: {r: 0, g: 0, b: 1, a: 1}
     prefab: {fileID: 789960872975729487, guid: f2e386f2e2d9709458be56653eceb738, type: 3}
   - color: {r: 0, g: 1, b: 0, a: 1}
-    prefab: {fileID: 4596619550987584133, guid: ceb6fe374a68d1a44ab929bdd92fc314,
+    prefab: {fileID: 7808975971974161233, guid: b9306c71951e09349a50421eadac460f,
+      type: 3}
+  - color: {r: 1, g: 0, b: 1, a: 1}
+    prefab: {fileID: 8549173034516852148, guid: 61ff26782e9ca0342b7cec42f36817c5,
+      type: 3}
+  - color: {r: 1, g: 0, b: 0, a: 1}
+    prefab: {fileID: 2212860947555976242, guid: 9e52b5ab8526a4746aed0848e89f7c95,
       type: 3}
   maxRooms: 5
-  scale: 0.5
-  startingRoom: {fileID: 11400000, guid: 2cf82f0992a3ca94a83b929405d4534d, type: 2}
+  scale: 3
   generatedRooms: []
 --- !u!1 &1804396439
 GameObject:
@@ -5311,8 +5331,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 1792031513}
   - {fileID: 144930449}
+  - {fileID: 1792031513}
   - {fileID: 500281388}
   - {fileID: 963194228}
   - {fileID: 507240530}

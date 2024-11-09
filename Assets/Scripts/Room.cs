@@ -1,55 +1,33 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Timeline;
-
-public enum Direction { UP, DOWN, LEFT, RIGHT }
-
-[CreateAssetMenu(fileName = "NewRoom", menuName = "ScriptableObjects/Room")]
-public class RoomSO : ScriptableObject
-{
-    public Texture2D layout;
-    public Direction[] directions;
-
-    public List<Vector2> GetDirections()
-    {
-        return directions.Select(dir => dir switch
-        {
-            Direction.UP => Vector2.up,
-            Direction.DOWN => Vector2.down,
-            Direction.LEFT => Vector2.left,
-            Direction.RIGHT => Vector2.right,
-            _ => Vector2.zero
-        }).ToList();
-    }
-}
-
 
 public class Room : MonoBehaviour
 {
-    public RoomSO baseRoom;
+    public Texture2D[] roomTextures;
     public Vector2 size;
     public float position;
     public ColorToPrefab[] colorMappings;
     public float scale = 1.0f;
     public LevelGenerator levelGenerator;
-    public int rotation;
 
-    private Texture2D map;
+    private Texture2D currentMap;
     private Vector2 offset;
     private Vector3 roomCenter;
     private float detectionRadius = 8f;
     private bool playerInRoom = false;
     private bool generated = false;
-    private bool playerEnteredRoom = false;
-    public void Initialize()
+
+    public void InitializeWithTexture(Texture2D texture)
     {
-        map = baseRoom.layout ?? throw new System.ArgumentNullException(nameof(baseRoom));
+        if (texture == null)
+            throw new System.ArgumentException("No room texture assigned");
+
+        currentMap = texture;
         levelGenerator = FindObjectOfType<LevelGenerator>();
-        offset = new Vector2(map.width * 0.5f, map.height * 0.5f) * scale;
+        offset = new Vector2(currentMap.width * 0.5f, currentMap.height * 0.5f) * scale;
         roomCenter = transform.position;
-        transform.rotation = Quaternion.Euler(0, rotation, 0);
-        detectionRadius = (map.width/2) * scale;
+        detectionRadius = (currentMap.width / 2) * scale;
     }
 
     void Update()
@@ -68,6 +46,7 @@ public class Room : MonoBehaviour
         }
         playerInRoom = currentPlayerInRoom;
     }
+
     protected virtual void OnPlayerEnter() => GenerateAdjacentRooms();
 
     protected virtual void OnPlayerExit() { }
@@ -80,12 +59,12 @@ public class Room : MonoBehaviour
 
     public void GenerateRoom()
     {
-        if (map == null || baseRoom == null || colorMappings == null)
+        if (currentMap == null || colorMappings == null)
             throw new System.ArgumentNullException();
 
-        for (int x = 0; x < map.width; x++)
+        for (int x = 0; x < currentMap.width; x++)
         {
-            for (int y = 0; y < map.height; y++)
+            for (int y = 0; y < currentMap.height; y++)
             {
                 GenerateTile(x, y);
             }
@@ -94,82 +73,38 @@ public class Room : MonoBehaviour
 
     void GenerateTile(int x, int y)
     {
-        Color pixColor = map.GetPixel(x, y);
+        Color pixColor = currentMap.GetPixel(x, y);
         if (pixColor.a == 0) return;
 
         var mapping = colorMappings.FirstOrDefault(cm => cm.color.Equals(pixColor));
         if (mapping.prefab != null)
         {
-            Vector2 rotatedPos = RotatePoint(new Vector2(x, y), rotation, map.width, map.height);
-            Vector3 position = transform.position + new Vector3((rotatedPos.x * scale) - offset.x, 0, (rotatedPos.y * scale) - offset.y);
-            var inst = Instantiate(mapping.prefab, position, Quaternion.Euler(0, rotation, 0), transform);
+            Vector3 position = transform.position + new Vector3((x * scale) - offset.x, 0, (y * scale) - offset.y);
+            var inst = Instantiate(mapping.prefab, position, Quaternion.identity, transform);
             inst.transform.localScale *= scale;
         }
     }
 
-    private Vector2 RotatePoint(Vector2 point, int rotationDegrees, int width, int height)
-    {
-        Vector2 center = new Vector2(width / 2f, height / 2f);
-        Vector2 dir = point - center;
-        float rad = rotationDegrees * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(rad);
-        float sin = Mathf.Sin(rad);
-        Vector2 rotatedDir = new Vector2(
-            dir.x * cos - dir.y * sin,
-            dir.x * sin + dir.y * cos
-        );
-        return center + rotatedDir;
-    }
     private void GenerateAdjacentRooms()
     {
         if (levelGenerator.generatedRooms.Count >= levelGenerator.maxRooms) return;
 
-        foreach (Vector2 exitDirection in GetExitDirections())
+        Vector3 newPosition = transform.position + new Vector3(0, 0, currentMap.height * scale);
+
+        if (!levelGenerator.roomPositions.ContainsKey(newPosition.z))
         {
-            // Only generate rooms in the upward direction
-            if (exitDirection != Vector2.up) continue;
-
-            Vector3 newPosition = transform.position + new Vector3(exitDirection.x * map.width * scale, 0, exitDirection.y * map.height * scale);
-
-            // Calculate the center of the new room
-            Vector3 newRoomCenter = newPosition;
-
-            if (!levelGenerator.roomPositions.ContainsKey(newRoomCenter.z))
-            {
-                RoomSO nextRoomSO;
-                int roomRotation;
-                if (levelGenerator.FindRoomWithEntrance(-exitDirection, out nextRoomSO, out roomRotation))
-                {
-                    levelGenerator.GenerateRoom(nextRoomSO, newRoomCenter, roomRotation);
-                }
-            }
+            levelGenerator.GenerateRoom(newPosition);
         }
+
         generated = true;
 
-        if (levelGenerator.generatedRooms.Count > levelGenerator.maxRooms-1)
+        if (levelGenerator.generatedRooms.Count > levelGenerator.maxRooms - 1)
         {
             Room firstRoom = levelGenerator.generatedRooms[0];
             levelGenerator.generatedRooms.RemoveAt(0);
             levelGenerator.roomPositions.Remove(firstRoom.position);
             Destroy(firstRoom.gameObject);
         }
-    }
-
-
-    public List<Vector2> GetExitDirections()
-    {
-        return baseRoom.GetDirections().Select(dir => RotateDirection(dir, rotation)).ToList();
-    }
-
-    private Vector2 RotateDirection(Vector2 dir, int rotationDegrees)
-    {
-        float rad = rotationDegrees * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(rad);
-        float sin = Mathf.Sin(rad);
-        return new Vector2(
-            dir.x * cos - dir.y * sin,
-            dir.x * sin + dir.y * cos
-        ).normalized;
     }
 
     private void OnDrawGizmos()
