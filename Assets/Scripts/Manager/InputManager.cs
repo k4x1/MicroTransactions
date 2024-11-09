@@ -42,7 +42,6 @@ public class InputManager : MonoBehaviour
             case InputMode.GYROSCOPE:
 /*                MovementVector = playerInput.Movement.Gyro.ReadValue<Vector3>();*/
                 HandleGyroscopeInput();
-                Debug.Log(MovementVector);
                 break;
         }
     }

@@ -42,6 +42,8 @@ public class PauseManager : MonoBehaviour
     {
         isPaused = pausedStatus;
         CheckPaused();
+
+
     }
 
     public void TogglePause()

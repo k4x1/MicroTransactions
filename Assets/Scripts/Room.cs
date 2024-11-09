@@ -17,6 +17,7 @@ public class Room : MonoBehaviour
     private float detectionRadius = 8f;
     private bool playerInRoom = false;
     private bool generated = false;
+    private bool entered = false;
 
     public void InitializeWithTexture(Texture2D texture)
     {
@@ -47,9 +48,17 @@ public class Room : MonoBehaviour
         playerInRoom = currentPlayerInRoom;
     }
 
-    protected virtual void OnPlayerEnter() => GenerateAdjacentRooms();
+    private void OnPlayerEnter()
+    {
+        if (entered) return;
+        GenerateAdjacentRooms();
+        GameManager.Instance.RestartTimer();
+        GameManager.Instance.AddPoints();
+        entered = true;
+    }
 
-    protected virtual void OnPlayerExit() { }
+
+    private void OnPlayerExit() { }
 
     public bool IsPlayerInRoom()
     {

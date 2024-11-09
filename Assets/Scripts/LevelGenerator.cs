@@ -14,8 +14,9 @@ public class LevelGenerator : MonoBehaviour
 
     void Start()
     {
-        if (roomTextures.Length == 0)
+        if (roomTextures.Length == 0) { 
             roomTextures = Resources.LoadAll<Texture2D>("Rooms").ToArray();
+        }
 
         GenerateInitialRoom();
     }
@@ -45,5 +46,17 @@ public class LevelGenerator : MonoBehaviour
 
         generatedRooms.Add(room);
         roomPositions[position.z] = room;
+    }
+    public void ResetGeneratedRooms()
+    {
+    ;
+        foreach (Room room in generatedRooms)
+        {
+            Destroy(room.gameObject);
+        }
+        generatedRooms.Clear();
+        roomPositions.Clear();
+
+        GenerateInitialRoom();
     }
 }

@@ -20,7 +20,9 @@ public class UiManager : MonoBehaviour
     [SerializeField] GameObject joystick;
     [SerializeField] GameObject resetGyroButton;
     [SerializeField] Timer timer;
-
+    [SerializeField] TMP_Text points;
+    [SerializeField] TMP_Text gems;
+    private bool updateGems = false;
     private void Awake()
     {
         if (Instance == null)
@@ -66,10 +68,25 @@ public class UiManager : MonoBehaviour
         if (!active)
         {
             timer.StartTimer();
+            GameManager.Instance.RestartGame();
+            updateGems = false;
         }
-            PauseManager.Instance.SetPaused(active);
+        else if (!updateGems) 
+        {
+            CurrencySystem.Instance.AddCurrency((int)GameManager.Instance.points / 10);
+            UiManager.Instance.UpdateGems(CurrencySystem.Instance.GetCurrency());
+            updateGems = true;
+        }
+        PauseManager.Instance.SetPaused(active);
         loseMenu.SetActive(active);
-    } 
+    }
+    public void RevivePlayer()
+    {
+        GameManager.Instance.RevivePlayer();
+        SetLoseMenu(false);
+        PauseManager.Instance.SetPaused(false);
+    }
+
     public void SetWinMenu(bool active)
     {
         if (!active)
@@ -80,6 +97,13 @@ public class UiManager : MonoBehaviour
         PauseManager.Instance.SetPaused(active);
         winMenu.SetActive(active);
     }
-
+    public void UpdatePoints(float pointsText)
+    {
+        points.text = "Points: " + (int)pointsText; 
+    }  
+    public void UpdateGems(float gemsText)
+    {
+        gems.text = "Gems: " + (int)gemsText; 
+    }       
 
 }

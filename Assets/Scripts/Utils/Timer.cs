@@ -73,4 +73,10 @@ public class Timer : MonoBehaviour
     {
         timerRunning = false;
     }
+
+    public void RestartTimer()
+    {
+        StopTimer();
+        StartTimer();
+    }
 }

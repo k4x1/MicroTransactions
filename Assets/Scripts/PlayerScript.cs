@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Runtime.CompilerServices;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -28,10 +29,17 @@ public class PlayerScript : MonoBehaviour
 
     private Timer speedBoostTimer;
 
+    private float baseY;
+    private bool isDelayCoroutineRunning = false;
     void Start()
     {
+        originalMaxSpeed = maxSpeed;
+        originalAccelerationRate = accelerationRate;
+
         rb = GetComponent<Rigidbody>();
         InputManager.Instance.SetInputMode(inputMode);
+
+        baseY = transform.position.y;
 
         speedBoostTimer = gameObject.AddComponent<Timer>();
         speedBoostTimer.timerDuration = speedBoostDuration;
@@ -44,7 +52,9 @@ public class PlayerScript : MonoBehaviour
         {
             UiManager.Instance.SetLoseMenu(true);
             PauseManager.Instance.Pause();
-            ResetPlayer();
+            maxSpeed = originalMaxSpeed;
+            accelerationRate = originalAccelerationRate;
+      
         }
 
         if (isBouncing)
@@ -55,8 +65,20 @@ public class PlayerScript : MonoBehaviour
                 isBouncing = false;
             }
         }
+        
+
 
         CheckForSpeedSurface();
+    }
+    public void RevivePlayer()
+    {
+        Vector3 currentPosition = transform.position;
+        transform.position = new Vector3(0, baseY, currentPosition.z);
+        rb.velocity = Vector3.zero;
+        isBouncing = false;
+        isOnSpeedSurface = false;
+        ResetSpeed();
+        rb.constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePositionY;
     }
 
     private void CheckForSpeedSurface()
@@ -74,23 +96,32 @@ public class PlayerScript : MonoBehaviour
             }
             else if (!hit.collider.CompareTag(speedObjectTag) && isOnSpeedSurface)
             {
-               // ResetSpeed();
+                // ResetSpeed();
             }
+            StopAllCoroutines(); 
+            isDelayCoroutineRunning = false;
+          
         }
         else
         {
-            if (isOnSpeedSurface)
+            if (!isDelayCoroutineRunning)
             {
-              //  ResetSpeed();
+                StartCoroutine(DelayAndFreezeConstraints());
             }
         }
     }
 
+    private IEnumerator DelayAndFreezeConstraints()
+    {
+        isDelayCoroutineRunning = true;
+        yield return new WaitForSeconds(1f);
+        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+        isDelayCoroutineRunning = false;
+    }
     private void ApplySpeedBoost()
     {
         isOnSpeedSurface = true;
-        originalMaxSpeed = maxSpeed;
-        originalAccelerationRate = accelerationRate;
+
 
         maxSpeed *= speedBoostMultiplier;
         accelerationRate *= speedBoostMultiplier;
@@ -191,8 +222,12 @@ public class PlayerScript : MonoBehaviour
 
     public void ResetPlayer()
     {
-        transform.position = new Vector3(0, 1, 0);
+        transform.position = new Vector3(0, baseY, 0);
         rb.velocity = Vector3.zero;
         isBouncing = false;
+        isOnSpeedSurface = false;
+        ResetSpeed();
+        rb.constraints = RigidbodyConstraints.None | RigidbodyConstraints.FreezePositionY;
+
     }
 }
