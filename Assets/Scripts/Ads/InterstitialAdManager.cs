@@ -4,12 +4,12 @@ using GoogleMobileAds.Api;
 public class InterstitialAdManager : MonoBehaviour
 {
     private InterstitialAd m_interstitialAd;
-    [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/1033173712"; // Test ID
+    [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/1033173712";
 
     void Start()
     {
         LoadInterstitialAd();
-        ShowInterstitialAd();
+      
     }
 
     public void LoadInterstitialAd()

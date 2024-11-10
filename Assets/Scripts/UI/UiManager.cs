@@ -74,8 +74,8 @@ public class UiManager : MonoBehaviour
         else if (!updateGems) 
         {
             CurrencySystem.Instance.AddCurrency((int)GameManager.Instance.points / 10);
-            UiManager.Instance.UpdateGems(CurrencySystem.Instance.GetCurrency());
             updateGems = true;
+            UpdateGems(CurrencySystem.Instance.GetCurrency());
         }
         PauseManager.Instance.SetPaused(active);
         loseMenu.SetActive(active);

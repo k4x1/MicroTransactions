@@ -24,20 +24,27 @@ public class CurrencySystem : MonoBehaviour
     void Start()
     {
         LoadCurrency();
+        if(MainMenuUi.Instance != null)
+        {
+            MainMenuUi.Instance.UpdateGems();
+        }
     }
 
     void OnApplicationQuit()
     {
         SaveCurrency();
     }
-    private void Update()
-    {
-        
-    }
     public void AddCurrency(int amount)
     {
-        
         currentCurrency += amount;
+        if (MainMenuUi.Instance != null)
+        {
+            MainMenuUi.Instance.UpdateGems();
+        }
+        if (UiManager.Instance != null)
+        {
+            UiManager.Instance.UpdateGems(currentCurrency);
+        }
     }  
     public int GetCurrency()
     {

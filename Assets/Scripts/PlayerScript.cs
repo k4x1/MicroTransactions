@@ -139,26 +139,25 @@ public class PlayerScript : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isBouncing)
+     
+        Vector2 moveVector = InputManager.Instance.MovementVector;
+
+        if (moveVector.magnitude > 0)
         {
-            Vector2 moveVector = InputManager.Instance.MovementVector;
-
-            if (moveVector.magnitude > 0)
-            {
-                Vector3 targetDirection = new Vector3(moveVector.x, 0, moveVector.y).normalized;
-                Accelerate(targetDirection);
-            }
-            else
-            {
-                Decelerate();
-            }
-
-            // Ensure the velocity doesn't exceed max speed
-            if (rb.velocity.magnitude > maxSpeed)
-            {
-                rb.velocity = rb.velocity.normalized * maxSpeed;
-            }
+            Vector3 targetDirection = new Vector3(moveVector.x, 0, moveVector.y).normalized;
+            Accelerate(targetDirection);
         }
+        else
+        {
+            Decelerate();
+        }
+
+        // Ensure the velocity doesn't exceed max speed
+        if (rb.velocity.magnitude > maxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
+        }
+        
     }
 
 

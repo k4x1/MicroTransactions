@@ -6,6 +6,7 @@ public class PauseManager : MonoBehaviour
     public static PauseManager Instance { get; private set; }
 
     [SerializeField] private bool isPaused = false;
+    [SerializeField] private bool isBannerVisible = false; // Track banner visibility
 
     public event Action<bool> OnPauseChanged;
 
@@ -60,6 +61,12 @@ public class PauseManager : MonoBehaviour
         Cursor.visible = true;
         InputManager.Instance.DisablePlayerInput();
         OnPauseChanged?.Invoke(true);
+
+        if (!isBannerVisible) 
+        {
+            AdManager.Instance.ShowBanner();
+            isBannerVisible = true; 
+        }
     }
 
     void UnPause()
@@ -68,5 +75,11 @@ public class PauseManager : MonoBehaviour
         Cursor.visible = false;
         InputManager.Instance.EnablePlayerInput();
         OnPauseChanged?.Invoke(false);
+
+        if (isBannerVisible) 
+        {
+            AdManager.Instance.HideBanner();
+            isBannerVisible = false; 
+        }
     }
 }
