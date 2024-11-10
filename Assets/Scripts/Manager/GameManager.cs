@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeAdMob();
         }
         else
         {
@@ -37,7 +38,13 @@ public class GameManager : MonoBehaviour
     {
         time.StartTimer();
     }
-
+  
+    private void InitializeAdMob()
+    {
+        AdMobInitializer adMobInitializer = gameObject.AddComponent<AdMobInitializer>();
+   
+        adMobInitializer.InitializeAdMob();
+    }
     public void AddPoints()
     {
         float elapsedTime = Time.time - lastPointTime;
@@ -65,6 +72,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        Debug.Log("gamestarted");
         gameStarted = true;
         SceneManager.LoadScene("Game");
         playerRef = GameObject.FindGameObjectWithTag("Player");

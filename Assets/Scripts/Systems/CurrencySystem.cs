@@ -2,6 +2,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
 
+
 public class CurrencySystem : MonoBehaviour
 {
     private int currentCurrency = 0;
