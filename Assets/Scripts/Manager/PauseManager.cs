@@ -1,10 +1,13 @@
 using UnityEngine;
+using System;
 
 public class PauseManager : MonoBehaviour
 {
     public static PauseManager Instance { get; private set; }
 
     [SerializeField] private bool isPaused = false;
+
+    public event Action<bool> OnPauseChanged;
 
     private void Awake()
     {
@@ -21,7 +24,8 @@ public class PauseManager : MonoBehaviour
 
     private void Start()
     {
-        if (GameManager.Instance.gameStarted) { 
+        if (GameManager.Instance.gameStarted)
+        {
             CheckPaused();
         }
     }
@@ -42,8 +46,6 @@ public class PauseManager : MonoBehaviour
     {
         isPaused = pausedStatus;
         CheckPaused();
-
-
     }
 
     public void TogglePause()
@@ -56,15 +58,15 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 0;
         Cursor.visible = true;
-       
         InputManager.Instance.DisablePlayerInput();
-     
+        OnPauseChanged?.Invoke(true);
     }
 
-     void UnPause()
+    void UnPause()
     {
         Time.timeScale = 1;
         Cursor.visible = false;
         InputManager.Instance.EnablePlayerInput();
+        OnPauseChanged?.Invoke(false);
     }
 }

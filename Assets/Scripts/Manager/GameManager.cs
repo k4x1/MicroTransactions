@@ -115,8 +115,9 @@ public class GameManager : MonoBehaviour
                 playerScript.RevivePlayer();
             }
         }
-        GameObject wave = FindObjectOfType<WaveController>().gameObject;
-        wave.transform.position = new Vector3(playerRef.transform.position.x,wave.transform.position.y, playerRef.transform.position.z -150);
+        WaveController wave = FindObjectOfType<WaveController>();
+        Debug.Log(wave);
+        wave.waveZPosition = playerRef.transform.position.z - 150;
 
     }
     private void ResetGameState()
