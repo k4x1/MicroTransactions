@@ -73,6 +73,7 @@ public class UiManager : MonoBehaviour
         }
         else if (!updateGems) 
         {
+            AdManager.Instance.ShowInterstitial();
             CurrencySystem.Instance.AddCurrency((int)GameManager.Instance.points / 10);
             updateGems = true;
             UpdateGems(CurrencySystem.Instance.GetCurrency());
