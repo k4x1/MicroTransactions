@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ObjectPool
 {
@@ -36,9 +37,25 @@ public class ObjectPool
         }
     }
 
+    public void ReturnAllObjects()
+    {
+/*        GameObject[] activeObjects = GameObject.FindObjectsOfType<GameObject>()
+            .Where(obj => obj.CompareTag(prefab.tag))
+            .ToArray();
+
+        foreach (GameObject obj in activeObjects)
+        {
+            ReturnObject(obj);
+        }*/
+    }
+
     public void ReturnObject(GameObject obj)
     {
-        obj.SetActive(false);
-        pool.Enqueue(obj);
+        if (obj != null)
+        {
+            obj.SetActive(false);
+            obj.transform.SetParent(parent);
+            pool.Enqueue(obj);
+        }
     }
 }

@@ -161,6 +161,21 @@ public class Room : MonoBehaviour
             Destroy(firstRoom.gameObject);
         }
     }
+    public void CleanUp()
+    {
+        foreach (var mapping in colorMappings)
+        {
+            if (mapping.pool != null)
+            {
+                mapping.pool.ReturnAllObjects();
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        CleanUp();
+    }
 
     private void OnDrawGizmos()
     {

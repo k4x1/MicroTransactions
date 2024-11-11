@@ -39,7 +39,12 @@ public class LevelGenerator : MonoBehaviour
 
     public void GenerateRoom(Vector3 position)
     {
-        if (generatedRooms.Count >= maxRooms) return;
+
+            Debug.Log(generatedRooms.Count + " | dqwedweded" );
+        if (generatedRooms.Count >= maxRooms)
+        {
+            RemoveOldestRoom();
+        }
 
         GameObject roomObj = new GameObject($"Room_{generatedRooms.Count}");
         roomObj.transform.position = position;
@@ -61,11 +66,25 @@ public class LevelGenerator : MonoBehaviour
         generatedRooms.Add(room);
         roomPositions[position.z] = room;
     }
+    private void RemoveOldestRoom()
+    {
+        if (generatedRooms.Count > 0)
+        {
+            Room oldestRoom = generatedRooms[0];
+
+            // Ensure the player is not in this room
+            oldestRoom.CleanUp();
+            generatedRooms.RemoveAt(0);
+            roomPositions.Remove(oldestRoom.position);
+            Destroy(oldestRoom.gameObject);
+            
+        }
+    }
     public void ResetGeneratedRooms()
     {
-    ;
         foreach (Room room in generatedRooms)
         {
+            room.CleanUp();
             Destroy(room.gameObject);
         }
         generatedRooms.Clear();
@@ -73,4 +92,5 @@ public class LevelGenerator : MonoBehaviour
 
         GenerateInitialRoom();
     }
+
 }

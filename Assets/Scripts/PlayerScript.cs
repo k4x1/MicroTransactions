@@ -50,10 +50,8 @@ public class PlayerScript : MonoBehaviour
     {
         if (transform.position.y < -20)
         {
-            UiManager.Instance.SetLoseMenu(true);
-            PauseManager.Instance.Pause();
-            maxSpeed = originalMaxSpeed;
-            accelerationRate = originalAccelerationRate;
+            Die();
+            
       
         }
 
@@ -69,6 +67,13 @@ public class PlayerScript : MonoBehaviour
 
 
         CheckForSpeedSurface();
+    }
+    public void Die()
+    {
+        UiManager.Instance.SetLoseMenu(true);
+        PauseManager.Instance.Pause();
+        maxSpeed = originalMaxSpeed;
+        accelerationRate = originalAccelerationRate;
     }
     public void RevivePlayer()
     {

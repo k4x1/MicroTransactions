@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Bounce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1192772950143295303
 Transform:
@@ -122,7 +122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31ebbbacb0236341ac5b9947e157b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reflectionFactor: 0.8
   playerTag: Player
 --- !u!136 &3917037686587876162
 CapsuleCollider:
@@ -159,6 +158,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: FloorTile
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910413905335229083, guid: 74e43cb44c2771b468bff762fc1c989e,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 8098444966036912695, guid: 74e43cb44c2771b468bff762fc1c989e,
         type: 3}

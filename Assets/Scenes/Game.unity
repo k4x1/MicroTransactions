@@ -474,7 +474,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MovementRange: 200
+  m_MovementRange: 100
   m_DynamicOriginRange: 100
   m_ControlPath: <Gamepad>/leftStick
   m_Behaviour: 0
@@ -4272,6 +4272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPaused: 0
+  isBannerVisible: 0
 --- !u!1 &1590630944
 GameObject:
   m_ObjectHideFlags: 0
@@ -4310,6 +4311,7 @@ MonoBehaviour:
   destroyableLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  playerRef: {fileID: 0}
 --- !u!65 &1590630946
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4818,8 +4820,9 @@ MonoBehaviour:
   - color: {r: 1, g: 0, b: 0, a: 1}
     prefab: {fileID: 2212860947555976242, guid: 9e52b5ab8526a4746aed0848e89f7c95,
       type: 3}
-  maxRooms: 5
+  maxRooms: 2
   scale: 3
+  initialPoolSize: 100
   generatedRooms: []
 --- !u!1 &1804396439
 GameObject:

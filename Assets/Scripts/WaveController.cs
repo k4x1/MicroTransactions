@@ -7,18 +7,19 @@ public class WaveController : MonoBehaviour
     public float acceleration = 0.1f;
     public float waveZPosition = 0f;
     public LayerMask destroyableLayers;
-
+    public GameObject playerRef;
     private float currentSpeed;
 
     void Start()
     {
+        playerRef = GameObject.FindGameObjectWithTag("Player");
         currentSpeed = initialSpeed;
     }
 
     void Update()
     {
         MoveWave();
-        CheckAndDestroyObjects();
+    //    CheckAndDestroyObjects();
         IncreaseSpeed();
     }
 
@@ -26,6 +27,10 @@ public class WaveController : MonoBehaviour
     {
         waveZPosition += currentSpeed * Time.deltaTime;
         transform.position = new Vector3(transform.position.x, transform.position.y, waveZPosition);
+        if(transform.position.z + transform.localScale.z > playerRef.transform.position.z)
+        {
+            playerRef.GetComponent<PlayerScript>().Die();
+        }
     }
 
     void CheckAndDestroyObjects()
