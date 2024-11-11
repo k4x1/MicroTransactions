@@ -120,7 +120,6 @@ public class GameManager : MonoBehaviour
             }
         }
         WaveController wave = FindObjectOfType<WaveController>();
-        Debug.Log(wave);
         wave.waveZPosition = playerRef.transform.position.z - 150;
 
     }
@@ -140,5 +139,7 @@ public class GameManager : MonoBehaviour
         {
             UiManager.Instance.UpdatePoints(points);
         }
+        WaveController wave = FindObjectOfType<WaveController>();
+        wave.waveZPosition = playerRef.transform.position.z - 150;
     }
 }
