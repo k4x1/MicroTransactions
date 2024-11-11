@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 public class Room : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class Room : MonoBehaviour
     private bool playerInRoom = false;
     private bool generated = false;
     private bool entered = false;
+    private bool isGenerating = false;
 
     public void InitializeWithTexture(Texture2D texture)
     {
@@ -30,6 +32,7 @@ public class Room : MonoBehaviour
         roomCenter = transform.position;
         detectionRadius = (currentMap.width / 2) * scale;
     }
+
 
     void Update()
     {
@@ -57,18 +60,11 @@ public class Room : MonoBehaviour
         entered = true;
     }
 
-
-    private void OnPlayerExit() { }
-
-    public bool IsPlayerInRoom()
+    private IEnumerator AsyncGenerateRoom()
     {
-        Transform playerTransform = GameManager.Instance.playerRef.transform;
-        return Vector3.Distance(roomCenter, playerTransform.position) <= detectionRadius;
-    }
-
-    public void GenerateRoom()
-    {
+        isGenerating = true;
         float startTime = Time.realtimeSinceStartup;
+
         if (currentMap == null || colorMappings == null)
             throw new System.ArgumentNullException();
 
@@ -91,6 +87,12 @@ public class Room : MonoBehaviour
                         tilesToInstantiate.Add((x, y, mapping.prefab));
                     }
                 }
+
+                // Yield every 100 iterations to give control back to Unity
+                if ((x % 100 == 0 && x != 0) || (y % 10 == 0 && y != 0))
+                {
+                    yield return null;
+                }
             }
         }
 
@@ -100,8 +102,21 @@ public class Room : MonoBehaviour
         float generationTime = endTime - startTime;
 
         Debug.Log($"Room generation completed in {generationTime:F4} seconds");
+        isGenerating = false;
+    }
+    private void OnPlayerExit() { }
+
+    public bool IsPlayerInRoom()
+    {
+        Transform playerTransform = GameManager.Instance.playerRef.transform;
+        return Vector3.Distance(roomCenter, playerTransform.position) <= detectionRadius;
     }
 
+    public void GenerateRoom()
+    {
+        if (isGenerating) return;
+        StartCoroutine(AsyncGenerateRoom());
+    }
     void BatchInstantiate(List<(int x, int y, GameObject prefab)> tiles)
     {
         foreach (var tile in tiles)
