@@ -52,7 +52,7 @@ public class Timer : MonoBehaviour
 
     private void TimerDone()
     {
-        Debug.Log("Timer done");
+
         if (onTimerComplete != null)
         {
             onTimerComplete.Invoke();

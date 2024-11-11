@@ -51,13 +51,13 @@ public class AdManager : MonoBehaviour
     public void HideBanner()
     {
         if (!GameManager.Instance.adsEnabled) return;
-        Debug.Log("hide");
+
         bannerManager.HideBannerAd();
     }
     public void ShowReward()
     {
         if (!GameManager.Instance.adsEnabled) return;
-        Debug.Log("show");
+
         rewardManager.ShowRewardedAd();
     }
 
