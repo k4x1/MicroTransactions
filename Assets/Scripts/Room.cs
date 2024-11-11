@@ -76,13 +76,25 @@ public class Room : MonoBehaviour
         int height = currentMap.height;
         Color32[] pixels = currentMap.GetPixels32();
 
+        List<(int x, int y, GameObject prefab)> tilesToInstantiate = new List<(int x, int y, GameObject prefab)>();
+
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                GenerateTile(x, y, pixels[y * width + x]);
+                Color32 pixColor = pixels[y * width + x];
+                if (pixColor.a != 0)
+                {
+                    var mapping = colorMappings.FirstOrDefault(cm => cm.color.Equals(pixColor));
+                    if (mapping.prefab != null)
+                    {
+                        tilesToInstantiate.Add((x, y, mapping.prefab));
+                    }
+                }
             }
         }
+
+        BatchInstantiate(tilesToInstantiate);
 
         float endTime = Time.realtimeSinceStartup;
         float generationTime = endTime - startTime;
@@ -90,6 +102,30 @@ public class Room : MonoBehaviour
         Debug.Log($"Room generation completed in {generationTime:F4} seconds");
     }
 
+    void BatchInstantiate(List<(int x, int y, GameObject prefab)> tiles)
+    {
+        foreach (var tile in tiles)
+        {
+            Vector3 position = transform.position + new Vector3((tile.x * scale) - offset.x, 0, (tile.y * scale) - offset.y);
+            var inst = GetObjectFromPool(tile.prefab, position);
+            inst.transform.localScale *= scale;
+        }
+    }
+
+    GameObject GetObjectFromPool(GameObject prefab, Vector3 position)
+    {
+        var mapping = colorMappings.FirstOrDefault(cm => cm.prefab == prefab);
+        if (mapping.pool != null)
+        {
+            GameObject obj = mapping.pool.GetObject();
+            obj.transform.position = position;
+            return obj;
+        }
+        else
+        {
+            return Instantiate(prefab, position, Quaternion.identity, transform);
+        }
+    }
     void GenerateTile(int x, int y, Color32 pixColor)
     {
         if (pixColor.a == 0) return;

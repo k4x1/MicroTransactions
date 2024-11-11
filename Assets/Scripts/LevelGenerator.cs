@@ -8,18 +8,32 @@ public class LevelGenerator : MonoBehaviour
     public ColorToPrefab[] colorMappings;
     public int maxRooms = 5;
     public float scale = 1.0f;
+    public int initialPoolSize = 100;
 
     public List<Room> generatedRooms = new List<Room>();
     public Dictionary<float, Room> roomPositions = new Dictionary<float, Room>();
 
     void Start()
     {
-        if (roomTextures.Length == 0) { 
+        if (roomTextures.Length == 0)
+        {
             roomTextures = Resources.LoadAll<Texture2D>("Rooms").ToArray();
         }
 
+        InitializeObjectPools();
         GenerateInitialRoom();
     }
+
+    void InitializeObjectPools()
+    {
+        colorMappings = colorMappings.Select(mapping =>
+        {
+            var newMapping = mapping;
+            newMapping.pool = new ObjectPool(mapping.prefab, initialPoolSize, transform);
+            return newMapping;
+        }).ToArray();
+    }
+
 
     void GenerateInitialRoom() => GenerateRoom(Vector3.zero);
 
