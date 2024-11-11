@@ -27,12 +27,19 @@ public class WaveController : MonoBehaviour
     {
         waveZPosition += currentSpeed * Time.deltaTime;
         transform.position = new Vector3(transform.position.x, transform.position.y, waveZPosition);
-        if(transform.position.z + transform.localScale.z > playerRef.transform.position.z)
+        if((transform.position.z + transform.localScale.z )> playerRef.transform.position.z)
         {
-            playerRef.GetComponent<PlayerScript>().Die();
+            Debug.Log(playerRef.transform.position.z + "is less than " + transform.position.z + transform.localScale.z);
+          //  playerRef.GetComponent<PlayerScript>().Die();
         }
     }
-
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            other.gameObject.GetComponent<PlayerScript>().Die();
+        }
+    }
     void CheckAndDestroyObjects()
     {
         Collider[] hitColliders = Physics.OverlapBox(

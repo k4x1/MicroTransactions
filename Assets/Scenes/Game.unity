@@ -2148,6 +2148,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 373061884}
   m_CullTransparentMesh: 1
+--- !u!1 &433952479
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 433952480}
+  - component: {fileID: 433952481}
+  m_Layer: 0
+  m_Name: ObjectPooler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &433952480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433952479}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 507240530}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &433952481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433952479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a0852273d08daa4c892bde3e47df726, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &500281384
 GameObject:
   m_ObjectHideFlags: 0
@@ -2306,6 +2350,7 @@ Transform:
   - {fileID: 273790901}
   - {fileID: 956741228}
   - {fileID: 1419862458}
+  - {fileID: 433952480}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &635480924
@@ -4327,7 +4372,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -4820,9 +4865,8 @@ MonoBehaviour:
   - color: {r: 1, g: 0, b: 0, a: 1}
     prefab: {fileID: 2212860947555976242, guid: 9e52b5ab8526a4746aed0848e89f7c95,
       type: 3}
-  maxRooms: 2
+  maxRooms: 5
   scale: 3
-  initialPoolSize: 100
   generatedRooms: []
 --- !u!1 &1804396439
 GameObject:
