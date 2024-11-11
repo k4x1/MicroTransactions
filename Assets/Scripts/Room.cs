@@ -68,21 +68,30 @@ public class Room : MonoBehaviour
 
     public void GenerateRoom()
     {
+        float startTime = Time.realtimeSinceStartup;
         if (currentMap == null || colorMappings == null)
             throw new System.ArgumentNullException();
 
-        for (int x = 0; x < currentMap.width; x++)
+        int width = currentMap.width;
+        int height = currentMap.height;
+        Color32[] pixels = currentMap.GetPixels32();
+
+        for (int y = 0; y < height; y++)
         {
-            for (int y = 0; y < currentMap.height; y++)
+            for (int x = 0; x < width; x++)
             {
-                GenerateTile(x, y);
+                GenerateTile(x, y, pixels[y * width + x]);
             }
         }
+
+        float endTime = Time.realtimeSinceStartup;
+        float generationTime = endTime - startTime;
+
+        Debug.Log($"Room generation completed in {generationTime:F4} seconds");
     }
 
-    void GenerateTile(int x, int y)
+    void GenerateTile(int x, int y, Color32 pixColor)
     {
-        Color pixColor = currentMap.GetPixel(x, y);
         if (pixColor.a == 0) return;
 
         var mapping = colorMappings.FirstOrDefault(cm => cm.color.Equals(pixColor));
@@ -92,6 +101,7 @@ public class Room : MonoBehaviour
             var inst = Instantiate(mapping.prefab, position, Quaternion.identity, transform);
             inst.transform.localScale *= scale;
         }
+
     }
 
     private void GenerateAdjacentRooms()
