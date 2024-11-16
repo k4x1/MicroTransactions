@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -57,16 +58,16 @@ public class Room : MonoBehaviour
         entered = true;
     }
 
-
     private void OnPlayerExit() { }
 
     public bool IsPlayerInRoom()
     {
         Transform playerTransform = GameManager.Instance.playerRef.transform;
-        return Vector3.Distance(roomCenter, playerTransform.position) <= detectionRadius;
+        float sqrDistance = (roomCenter - playerTransform.position).sqrMagnitude;
+        return sqrDistance <= detectionRadius * detectionRadius;
     }
 
-    public void GenerateRoom()
+    public IEnumerator GenerateRoomCoroutine()
     {
         float startTime = Time.realtimeSinceStartup;
         if (currentMap == null || colorMappings == null)
@@ -75,12 +76,19 @@ public class Room : MonoBehaviour
         int width = currentMap.width;
         int height = currentMap.height;
         Color32[] pixels = currentMap.GetPixels32();
+        int batchSize = 100; // Number of tiles to process per frame
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 GenerateTile(x, y, pixels[y * width + x]);
+
+                // Yield control every batchSize tiles
+                if ((y * width + x) % batchSize == 0)
+                {
+                    yield return null;
+                }
             }
         }
 
@@ -88,6 +96,11 @@ public class Room : MonoBehaviour
         float generationTime = endTime - startTime;
 
         Debug.Log($"Room generation completed in {generationTime:F4} seconds");
+    }
+
+    public void StartRoomGeneration()
+    {
+        StartCoroutine(GenerateRoomCoroutine());
     }
 
     private void GenerateTile(int x, int y, Color32 pixColor)
@@ -137,7 +150,6 @@ public class Room : MonoBehaviour
             firstRoom.gameObject.SetActive(false);
         }
     }
-
 
     private void OnDrawGizmos()
     {

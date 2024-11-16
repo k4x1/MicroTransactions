@@ -45,6 +45,7 @@ public class PlayerScript : MonoBehaviour
         speedBoostTimer.timerDuration = speedBoostDuration;
         speedBoostTimer.StopTimer(); // Initially stopped
         speedBoostTimer.SetOnTimerComplete(() => ResetSpeed());
+        UnlockBallinAchievement();
     }
     void Update()
     {
@@ -141,7 +142,21 @@ public class PlayerScript : MonoBehaviour
         accelerationRate = originalAccelerationRate;
         speedBoostTimer.StopTimer();
     }
-
+    void UnlockBallinAchievement()
+    {
+        if (Social.localUser.authenticated)
+        {
+            Social.ReportProgress(GPGSIds.achievement_ballin, 100.0f, (bool success) =>
+            {
+                Debug.Log($"Achievement 'Ballin' unlocked: {success}");
+                if (success)
+                {
+                    // Display the achievements UI
+                    Social.ShowAchievementsUI();
+                }
+            });
+        }
+    }
     private void FixedUpdate()
     {
      

@@ -49,7 +49,7 @@ public class LevelGenerator : MonoBehaviour
         Texture2D chosenTexture = roomTextures[Random.Range(0, roomTextures.Length)];
         room.InitializeWithTexture(chosenTexture);
 
-        room.GenerateRoom();
+        room.StartRoomGeneration();
 
         generatedRooms.Add(room);
         roomPositions[position.z] = room;

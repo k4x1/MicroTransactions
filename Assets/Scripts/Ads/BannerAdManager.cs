@@ -104,7 +104,7 @@ public class BannerAdManager : MonoBehaviour
         {
             Debug.Log("Destroying banner ad");
             m_bannerView.Hide();
-            m_bannerView.Destroy();
+           // m_bannerView.Destroy();
             m_bannerView = null;
             m_loaded = false;
         }

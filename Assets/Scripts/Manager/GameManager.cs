@@ -86,6 +86,7 @@ public class GameManager : MonoBehaviour
         ResetPlayer();
         ResetLevelGeneration();
         ResetGameState();
+        CurrencySystem.Instance.SaveCurrency();
     }
 
     private void ResetPlayer()

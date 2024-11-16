@@ -68,13 +68,13 @@ public class UiManager : MonoBehaviour
         if (!active)
         {
             timer.StartTimer();
-            GameManager.Instance.RestartGame();
             updateGems = false;
         }
         else if (!updateGems) 
         {
             AdManager.Instance.ShowInterstitial();
             CurrencySystem.Instance.AddCurrency((int)GameManager.Instance.points / 10);
+            CurrencySystem.Instance.SaveCurrency();
             updateGems = true;
             UpdateGems(CurrencySystem.Instance.GetCurrency());
         }
@@ -84,6 +84,12 @@ public class UiManager : MonoBehaviour
     public void RevivePlayer()
     {
         GameManager.Instance.RevivePlayer();
+        SetLoseMenu(false);
+        PauseManager.Instance.SetPaused(false);
+    }
+    public void ResetGame()
+    {
+        GameManager.Instance.RestartGame();
         SetLoseMenu(false);
         PauseManager.Instance.SetPaused(false);
     }

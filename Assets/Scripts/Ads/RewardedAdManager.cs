@@ -5,6 +5,7 @@ public class RewardedAdManager : MonoBehaviour
 {
     private RewardedAd m_rewardedAd;
     [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/5224354917";
+    private const int REWARD_AMOUNT = 100;
     void Start()
     {
         LoadRewardedAd();
@@ -60,7 +61,6 @@ public class RewardedAdManager : MonoBehaviour
             Debug.LogError("Rewarded ad failed, error: " + _err);
             LoadRewardedAd(); // Reload the ad
         };
-
     }
 
     public bool ShowRewardedAd()
@@ -81,8 +81,19 @@ public class RewardedAdManager : MonoBehaviour
     private void OnUserEarnedReward(Reward reward)
     {
         Debug.Log("User earned reward: " + reward.Type + ", amount: " + reward.Amount);
-        // Implement reward logic here, e.g., give the user in-game currency
+
+        // Add gems to the player's currency
+        if (CurrencySystem.Instance != null)
+        {
+            CurrencySystem.Instance.AddCurrency(REWARD_AMOUNT);
+            Debug.Log($"Added {REWARD_AMOUNT} gems to player's currency.");
+        }
+        else
+        {
+            Debug.LogWarning("CurrencySystem instance not found. Unable to add reward.");
+        }
     }
+
     void OnDestroy()
     {
         if (m_rewardedAd != null)

@@ -1,12 +1,19 @@
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using UnityEngine;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
 
+[System.Serializable]
+public class CurrencyData
+{
+    public int currentCurrency;
+}
 
 public class CurrencySystem : MonoBehaviour
 {
     private int currentCurrency = 0;
-    private const string SAVE_FILE = "/currency.dat";
+    private const string SAVE_FILE = "/currency.json";
     public static CurrencySystem Instance { get; private set; }
 
     private void Awake()
@@ -21,10 +28,11 @@ public class CurrencySystem : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     void Start()
     {
         LoadCurrency();
-        if(MainMenuUi.Instance != null)
+        if (MainMenuUi.Instance != null)
         {
             MainMenuUi.Instance.UpdateGems();
         }
@@ -34,6 +42,7 @@ public class CurrencySystem : MonoBehaviour
     {
         SaveCurrency();
     }
+
     public void AddCurrency(int amount)
     {
         currentCurrency += amount;
@@ -45,36 +54,36 @@ public class CurrencySystem : MonoBehaviour
         {
             UiManager.Instance.UpdateGems(currentCurrency);
         }
-    }  
+    }
+
     public int GetCurrency()
     {
         return currentCurrency;
     }
-    void LoadCurrency()
+
+    public void LoadCurrency()
     {
         string filePath = Path.Combine(Application.persistentDataPath, SAVE_FILE);
         if (File.Exists(filePath))
         {
-            Debug.Log("currency started");
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream file = File.Open(filePath, FileMode.Open);
-            currentCurrency = (int)formatter.Deserialize(file);
-            Debug.Log(currentCurrency);
-            file.Close();
+            string jsonData = File.ReadAllText(filePath);
+            CurrencyData data = JsonConvert.DeserializeObject<CurrencyData>(jsonData);
+            currentCurrency = data.currentCurrency;
+            Debug.Log($"Loaded currency: {currentCurrency}");
         }
         else
         {
-            currentCurrency = 10; 
+            currentCurrency = 10;
+            Debug.Log("No save file found. Starting with default currency.");
         }
     }
 
-    void SaveCurrency()
+    public void SaveCurrency()
     {
-        BinaryFormatter formatter = new BinaryFormatter();
-        FileStream file = File.Create(Path.Combine(Application.persistentDataPath, SAVE_FILE));
-        formatter.Serialize(file, currentCurrency);
-        file.Close();
+        CurrencyData data = new CurrencyData { currentCurrency = currentCurrency };
+        string jsonData = JsonConvert.SerializeObject(data);
+        string filePath = Path.Combine(Application.persistentDataPath, SAVE_FILE);
+        File.WriteAllText(filePath, jsonData);
+        Debug.Log($"Saved currency: {currentCurrency}");
     }
-
-    
 }
