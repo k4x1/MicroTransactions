@@ -1,10 +1,21 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : InterstitialAdManager.cs
+/// Description : This class is responsible for managing interstitial advertisements in the application.
+///               It loads and displays full-screen interstitial ads using the Google Mobile Ads SDK.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using GoogleMobileAds.Api;
 
 public class InterstitialAdManager : MonoBehaviour
 {
     private InterstitialAd m_interstitialAd;
-    [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/1033173712";
+    [SerializeField] private string m_adUnitID = "ca-app-pub-4010580083693927/3117991691";// "ca-app-pub-3940256099942544/1033173712";
 
     void Start()
     {

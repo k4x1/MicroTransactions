@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : LevelGenerator.cs
+/// Description : This class implements procedural level generation for the game.
+///               It manages the creation of rooms, handles room textures and color mappings,
+///               and provides functionality for resetting and regenerating levels.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;

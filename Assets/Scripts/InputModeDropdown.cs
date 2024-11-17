@@ -1,3 +1,16 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : InputModeDropdown.cs
+/// Description : This class manages the input mode selection dropdown in the UI.
+///               It handles the initialization of the dropdown options,
+///               updates the input mode when the selection changes,
+///               and manages the visibility of the reset gyroscope button.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;

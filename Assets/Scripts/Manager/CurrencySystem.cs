@@ -1,19 +1,19 @@
 using UnityEngine;
-using System.Collections;
 using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Runtime.Serialization.Formatters.Binary;
 
 [System.Serializable]
 public class CurrencyData
 {
     public int currentCurrency;
+    public bool adsEnabled;
 }
 
 public class CurrencySystem : MonoBehaviour
 {
     private int currentCurrency = 0;
-    private const string SAVE_FILE = "/currency.json";
+    private const string SAVE_FILE = "/currency.dat";
+    public bool adsEnabled = true;
     public static CurrencySystem Instance { get; private set; }
 
     private void Awake()
@@ -36,11 +36,17 @@ public class CurrencySystem : MonoBehaviour
         {
             MainMenuUi.Instance.UpdateGems();
         }
+        Debug.Log(SAVE_FILE);
     }
 
     void OnApplicationQuit()
     {
         SaveCurrency();
+    }
+
+    public bool GetAdsEnabled()
+    {
+        return adsEnabled;
     }
 
     public void AddCurrency(int amount)
@@ -54,6 +60,11 @@ public class CurrencySystem : MonoBehaviour
         {
             UiManager.Instance.UpdateGems(currentCurrency);
         }
+        SaveCurrency();
+        if (currentCurrency > 200)
+        {
+            GameManager.Instance.UnlockAchievement(GPGSIds.achievement_gems_a_plenty);
+        }
     }
 
     public int GetCurrency()
@@ -66,24 +77,38 @@ public class CurrencySystem : MonoBehaviour
         string filePath = Path.Combine(Application.persistentDataPath, SAVE_FILE);
         if (File.Exists(filePath))
         {
-            string jsonData = File.ReadAllText(filePath);
-            CurrencyData data = JsonConvert.DeserializeObject<CurrencyData>(jsonData);
-            currentCurrency = data.currentCurrency;
-            Debug.Log($"Loaded currency: {currentCurrency}");
+            byte[] data = File.ReadAllBytes(filePath);
+            BinaryFormatter formatter = new BinaryFormatter();
+            MemoryStream stream = new MemoryStream(data);
+            CurrencyData loadedData = formatter.Deserialize(stream) as CurrencyData;
+            currentCurrency = loadedData.currentCurrency;
+            adsEnabled = loadedData.adsEnabled;
+            Debug.Log($"Loaded currency: {currentCurrency}, Ads Enabled: {adsEnabled}");
         }
         else
         {
             currentCurrency = 10;
-            Debug.Log("No save file found. Starting with default currency.");
+            adsEnabled = true;
+            Debug.Log("No save file found. Starting with default currency and ads enabled.");
         }
     }
 
     public void SaveCurrency()
     {
-        CurrencyData data = new CurrencyData { currentCurrency = currentCurrency };
-        string jsonData = JsonConvert.SerializeObject(data);
+        CurrencyData data = new CurrencyData { currentCurrency = currentCurrency, adsEnabled = adsEnabled };
+        BinaryFormatter formatter = new BinaryFormatter();
+        MemoryStream stream = new MemoryStream();
+        formatter.Serialize(stream, data);
+        byte[] bytes = stream.ToArray();
         string filePath = Path.Combine(Application.persistentDataPath, SAVE_FILE);
-        File.WriteAllText(filePath, jsonData);
-        Debug.Log($"Saved currency: {currentCurrency}");
+        File.WriteAllBytes(filePath, bytes);
+        Debug.Log($"Saved currency: {currentCurrency}, Ads Enabled: {adsEnabled}");
+    }
+
+    public void DisableAds()
+    {
+        adsEnabled = false;
+        SaveCurrency();
+        Debug.Log("Ads have been disabled.");
     }
 }

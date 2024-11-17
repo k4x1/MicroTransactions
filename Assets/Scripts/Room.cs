@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : Room.cs
+/// Description : This class represents a procedurally generated room in the game.
+///               It handles room initialization, tile generation, player detection,
+///               and adjacent room generation for infinite level design.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;

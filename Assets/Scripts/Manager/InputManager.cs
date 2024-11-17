@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : InputManager.cs
+/// Description : This class is responsible for managing input systems in the application.
+///               It handles joystick, relative touch, and gyroscope inputs, allowing for flexible control options.
+///               It also manages the switching between different input modes.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using UnityEngine.InputSystem;
 

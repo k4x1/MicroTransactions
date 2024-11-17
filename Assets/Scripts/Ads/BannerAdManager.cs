@@ -1,3 +1,14 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : BannerAdManager.cs
+/// Description : This class is responsible for managing banner advertisements in the application.
+///               It creates, loads, shows, and hides banner ads using the Google Mobile Ads SDK.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using GoogleMobileAds.Api;
 using UnityEditor;
@@ -5,7 +16,8 @@ using UnityEditor;
 public class BannerAdManager : MonoBehaviour
 {
     private BannerView m_bannerView;
-    [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/6300978111"; // Test ID
+    //
+    [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/6300978111"; //     "ca-app-pub-4010580083693927~4005689652"
     public bool m_loaded = false;
     void Start()
     {

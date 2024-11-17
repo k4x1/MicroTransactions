@@ -24,7 +24,9 @@
 
 public static class GPGSIds
 {
+        public const string achievement_gems_a_plenty = "CgkI79vv3pgbEAIQBQ"; // <GPGSID>
         public const string achievement_ballin = "CgkI79vv3pgbEAIQAA"; // <GPGSID>
+        public const string achievement_points_a_plenty = "CgkI79vv3pgbEAIQBA"; // <GPGSID>
         public const string leaderboard_ballin_masters = "CgkI79vv3pgbEAIQAg"; // <GPGSID>
         public const string event_gem = "CgkI79vv3pgbEAIQAQ"; // <GPGSID>
 

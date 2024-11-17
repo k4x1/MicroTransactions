@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : SafeAreaAdjuster.cs
+/// Description : This class adjusts the position of UI elements to fit within the device's safe area.
+///               It handles positioning for both top-left and top-right corners, taking into account
+///               device notches and other screen features that may obstruct UI elements.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 
 public class SafeAreaAdjuster : MonoBehaviour

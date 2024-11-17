@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : WaveController.cs
+/// Description : This class manages the wave movement and destruction in the game.
+///               It handles wave position updates, speed acceleration,
+///               and object destruction based on the wave's position.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using System.Collections.Generic;
 

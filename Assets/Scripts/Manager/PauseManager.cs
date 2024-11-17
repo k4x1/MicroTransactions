@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : PauseManager.cs
+/// Description : This class is responsible for managing the game's pause state.
+///               It handles pausing and unpausing the game, including time scale changes,
+///               input management, and banner ad visibility.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using System;
 

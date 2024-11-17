@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : Timer.cs
+/// Description : This class implements a countdown timer functionality.
+///               It manages the timer duration, updates the display,
+///               and provides methods for starting, stopping, and restarting the timer.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using TMPro;
 

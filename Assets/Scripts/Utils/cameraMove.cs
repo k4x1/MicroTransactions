@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : CameraMove.cs
+/// Description : This class manages the camera movement in the game.
+///               It handles smooth camera following of the player,
+///               including look-ahead positioning and separate Z-axis smoothing.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 
 public class CameraMove : MonoBehaviour

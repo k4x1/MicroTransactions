@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : PlayerScript.cs
+/// Description : This class manages the player's movement and behavior in the game.
+///               It handles input processing, acceleration, deceleration, bouncing,
+///               speed boosts, and collision detection for the player object.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using System.Collections;
 using UnityEngine;
 using TMPro;
@@ -45,7 +57,7 @@ public class PlayerScript : MonoBehaviour
         speedBoostTimer.timerDuration = speedBoostDuration;
         speedBoostTimer.StopTimer(); // Initially stopped
         speedBoostTimer.SetOnTimerComplete(() => ResetSpeed());
-        UnlockBallinAchievement();
+        GameManager.Instance.UnlockAchievement(GPGSIds.achievement_ballin);
     }
     void Update()
     {
@@ -142,21 +154,7 @@ public class PlayerScript : MonoBehaviour
         accelerationRate = originalAccelerationRate;
         speedBoostTimer.StopTimer();
     }
-    void UnlockBallinAchievement()
-    {
-        if (Social.localUser.authenticated)
-        {
-            Social.ReportProgress(GPGSIds.achievement_ballin, 100.0f, (bool success) =>
-            {
-                Debug.Log($"Achievement 'Ballin' unlocked: {success}");
-                if (success)
-                {
-                    // Display the achievements UI
-                    Social.ShowAchievementsUI();
-                }
-            });
-        }
-    }
+
     private void FixedUpdate()
     {
      

@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : ObjectPooler.cs
+/// Description : This class implements an object pooling system for efficient game object management.
+///               It provides methods for retrieving and returning pooled objects,
+///               as well as clearing pools for specific tags or all pools.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using System.Collections.Generic;
 

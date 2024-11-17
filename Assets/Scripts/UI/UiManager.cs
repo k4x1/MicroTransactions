@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : UiManager.cs
+/// Description : This class manages various aspects of the user interface.
+///               It handles input mode switching, pause menu, win/lose menus,
+///               timer display, points and gems display, and player revival.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -72,17 +84,17 @@ public class UiManager : MonoBehaviour
         }
         else if (!updateGems) 
         {
-            AdManager.Instance.ShowInterstitial();
             CurrencySystem.Instance.AddCurrency((int)GameManager.Instance.points / 10);
-            CurrencySystem.Instance.SaveCurrency();
             updateGems = true;
             UpdateGems(CurrencySystem.Instance.GetCurrency());
+            AdManager.Instance.ShowInterstitial();
         }
         PauseManager.Instance.SetPaused(active);
         loseMenu.SetActive(active);
     }
     public void RevivePlayer()
     {
+        if (CurrencySystem.Instance.GetCurrency() < 100) return;
         GameManager.Instance.RevivePlayer();
         SetLoseMenu(false);
         PauseManager.Instance.SetPaused(false);

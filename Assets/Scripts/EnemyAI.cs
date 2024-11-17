@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : EnemyAI.cs
+/// Description : This class implements enemy AI behavior.
+///               It handles enemy movement towards the player,
+///               collision detection, and shrinking/destruction upon collision.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using System.Collections;
 using UnityEngine;
 

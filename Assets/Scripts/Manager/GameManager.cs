@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : GameManager.cs
+/// Description : This class is responsible for managing the overall game state and flow.
+///               It handles game initialization, restarts, scoring, timer management,
+///               achievement unlocking, and transitions between game states.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,15 +30,13 @@ public class GameManager : MonoBehaviour
 
     private float lastPointTime;
 
-    public bool adsEnabled = true;
+    
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-
         }
         else
         {
@@ -58,7 +68,10 @@ public class GameManager : MonoBehaviour
 
         points += pointsToAdd;
         lastPointTime = Time.time;
-
+        if(points> 200)
+        {
+            UnlockAchievement(GPGSIds.achievement_points_a_plenty);
+        }    
         UiManager.Instance.UpdatePoints(points);
     }
 
@@ -66,7 +79,25 @@ public class GameManager : MonoBehaviour
     {
         won = true;
     }
-
+    public void UnlockAchievement(string achievementId)
+    {
+        if (Social.localUser.authenticated)
+        {
+            Social.ReportProgress(achievementId, 100.0f, (bool success) =>
+            {
+                Debug.Log($"Achievement '{achievementId}' unlocked: {success}");
+                if (success)
+                {
+                    // Display the achievements UI
+                    Social.ShowAchievementsUI();
+                }
+            });
+        }
+        else
+        {
+            Debug.LogWarning("User is not authenticated. Cannot unlock achievements.");
+        }
+    }
     public void StartGame()
     {
         gameStarted = true;
@@ -86,7 +117,7 @@ public class GameManager : MonoBehaviour
         ResetPlayer();
         ResetLevelGeneration();
         ResetGameState();
-        CurrencySystem.Instance.SaveCurrency();
+       
     }
 
     private void ResetPlayer()
@@ -112,6 +143,7 @@ public class GameManager : MonoBehaviour
     }
     public void RevivePlayer()
     {
+     
         if (playerRef != null)
         {
             PlayerScript playerScript = playerRef.GetComponent<PlayerScript>();
@@ -122,6 +154,7 @@ public class GameManager : MonoBehaviour
         }
         WaveController wave = FindObjectOfType<WaveController>();
         wave.waveZPosition = playerRef.transform.position.z - 150;
+       CurrencySystem.Instance.AddCurrency(-100);
 
     }
     private void ResetGameState()

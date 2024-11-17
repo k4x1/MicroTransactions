@@ -1,3 +1,15 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : LevelMovement.cs
+/// Description : This class manages the movement and orientation of the game level.
+///               It handles tilt-based movement, collision detection, and input mode switching.
+///               It also implements custom movement logic for both surface and falling states.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 
 public class LevelMovement : MonoBehaviour

@@ -1,10 +1,22 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : RewardedAdManager.cs
+/// Description : This class is responsible for managing rewarded advertisements in the application.
+///               It loads and displays full-screen rewarded ads using the Google Mobile Ads SDK,
+///               providing rewards to users upon successful completion of the ad.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using GoogleMobileAds.Api;
 
 public class RewardedAdManager : MonoBehaviour
 {
     private RewardedAd m_rewardedAd;
-    [SerializeField] private string m_adUnitID = "ca-app-pub-3940256099942544/5224354917";
+    [SerializeField] private string m_adUnitID = "ca-app-pub-4010580083693927/3000500257";// "ca-app-pub-3940256099942544/5224354917";
     private const int REWARD_AMOUNT = 100;
     void Start()
     {
