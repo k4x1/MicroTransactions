@@ -18,7 +18,6 @@ using System.Collections.Generic;
 public class InputModeDropdown : MonoBehaviour
 {
     [SerializeField] private TMP_Dropdown inputModeDropdown;
-    [SerializeField] private LevelMovement levelMovement;
     [SerializeField] private GameObject resetGyroscopeButton;
 
     private void Start()
@@ -35,8 +34,8 @@ public class InputModeDropdown : MonoBehaviour
             List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>
             {
                 new TMP_Dropdown.OptionData("Joystick"),
-                new TMP_Dropdown.OptionData("Relative Touch"),
-                new TMP_Dropdown.OptionData("Gyroscope")
+                new TMP_Dropdown.OptionData("Relative Touch")
+                //new TMP_Dropdown.OptionData("Gyroscope")
             };
             inputModeDropdown.AddOptions(options);
 
@@ -66,15 +65,9 @@ public class InputModeDropdown : MonoBehaviour
     }
 
     public void ResetGyroscope()
-    {
-        if (levelMovement != null)
-        {
-            levelMovement.ResetGyroscope();
-        }
-        else
-        {
-            InputManager.Instance.ResetGyroscope();
-        }
+    {  
+        InputManager.Instance.ResetGyroscope();
+        
     }
 
     private void UpdateResetGyroscopeButtonVisibility()

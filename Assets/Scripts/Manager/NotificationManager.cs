@@ -1,3 +1,13 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : NotificationManager.cs
+/// Description : This class manages notifications for the game, including initialization, scheduling, and permission handling.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using Unity.Notifications.Android;
 using System.Collections.Generic;
