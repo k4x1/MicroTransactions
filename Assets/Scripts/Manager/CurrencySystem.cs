@@ -1,6 +1,18 @@
+/// <summary>
+/// Bachelor of Software Engineering
+/// Media Design School
+/// Auckland
+/// New Zealand
+/// (c) 2024 Media Design School
+/// File Name : CurrencySystem.cs
+/// Description : This class is responsible for managing the in-game currency system.
+///               It handles saving and loading currency data, adding currency, and
+///               controlling advertisement settings. It uses JSON serialization for data persistence.
+/// Author : Kazuo Reis de Andrade
+/// </summary>
 using UnityEngine;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json;
 
 [System.Serializable]
 public class CurrencyData
@@ -12,7 +24,7 @@ public class CurrencyData
 public class CurrencySystem : MonoBehaviour
 {
     private int currentCurrency = 0;
-    private const string SAVE_FILE = "/currency.dat";
+    private const string SAVE_FILE = "currency.json";
     public bool adsEnabled = true;
     public static CurrencySystem Instance { get; private set; }
 
@@ -77,12 +89,10 @@ public class CurrencySystem : MonoBehaviour
         string filePath = Path.Combine(Application.persistentDataPath, SAVE_FILE);
         if (File.Exists(filePath))
         {
-            byte[] data = File.ReadAllBytes(filePath);
-            BinaryFormatter formatter = new BinaryFormatter();
-            MemoryStream stream = new MemoryStream(data);
-            CurrencyData loadedData = formatter.Deserialize(stream) as CurrencyData;
-            currentCurrency = loadedData.currentCurrency;
-            adsEnabled = loadedData.adsEnabled;
+            string jsonData = File.ReadAllText(filePath);
+            CurrencyData data = JsonConvert.DeserializeObject<CurrencyData>(jsonData);
+            currentCurrency = data.currentCurrency;
+            adsEnabled = data.adsEnabled;
             Debug.Log($"Loaded currency: {currentCurrency}, Ads Enabled: {adsEnabled}");
         }
         else
@@ -96,15 +106,11 @@ public class CurrencySystem : MonoBehaviour
     public void SaveCurrency()
     {
         CurrencyData data = new CurrencyData { currentCurrency = currentCurrency, adsEnabled = adsEnabled };
-        BinaryFormatter formatter = new BinaryFormatter();
-        MemoryStream stream = new MemoryStream();
-        formatter.Serialize(stream, data);
-        byte[] bytes = stream.ToArray();
+        string jsonData = JsonConvert.SerializeObject(data);
         string filePath = Path.Combine(Application.persistentDataPath, SAVE_FILE);
-        File.WriteAllBytes(filePath, bytes);
+        File.WriteAllText(filePath, jsonData);
         Debug.Log($"Saved currency: {currentCurrency}, Ads Enabled: {adsEnabled}");
     }
-
     public void DisableAds()
     {
         adsEnabled = false;
